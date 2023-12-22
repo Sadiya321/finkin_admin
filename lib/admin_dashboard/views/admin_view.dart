@@ -1,15 +1,15 @@
+import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:finkin_admin/screencolor/screen_color.dart';
 import 'package:flutter/material.dart';
 
-class AdminScreen extends StatefulWidget {
-  const AdminScreen({Key? key}) : super(key: key);
+class AdminView extends StatefulWidget {
+  const AdminView({Key? key}) : super(key: key);
 
   @override
-  State<AdminScreen> createState() => _AdminScreenState();
+  State<AdminView> createState() => _AdminViewState();
 }
 
-class _AdminScreenState extends State<AdminScreen> {
+class _AdminViewState extends State<AdminView> {
   List<double> monthlyData = [30, 50, 80, 40, 60, 90, 70, 100, 50, 80, 120, 90];
 
   @override
@@ -41,19 +41,35 @@ class _AdminScreenState extends State<AdminScreen> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(height: 25,),
+                    const SizedBox(
+                      height: 25,
+                    ),
                     buildDrawerItem(Icons.dashboard, 'Dashboard', () {}),
-                    const SizedBox(height: 15,),
+                    const SizedBox(
+                      height: 15,
+                    ),
                     buildDrawerItem(Icons.people, 'Loan Request', () {}),
-                    const SizedBox(height: 15,),
-                    buildDrawerItem(Icons.check_circle, 'Approved Loans', () {}),
-                    const SizedBox(height: 15,),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    buildDrawerItem(
+                        Icons.check_circle, 'Approved Loans', () {}),
+                    const SizedBox(
+                      height: 15,
+                    ),
                     buildDrawerItem(Icons.monetization_on, 'All Loans', () {}),
-                    const SizedBox(height: 15,),
+                    const SizedBox(
+                      height: 15,
+                    ),
                     buildDrawerItem(Icons.people, 'All Users', () {}),
-                    const SizedBox(height: 15,),
-                    buildDrawerItem(Icons.supervised_user_circle, 'All Agents', () {}),
-                    const SizedBox(height: 15,),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    buildDrawerItem(
+                        Icons.supervised_user_circle, 'All Agents', () {}),
+                    const SizedBox(
+                      height: 15,
+                    ),
                   ],
                 ),
               ),
@@ -84,19 +100,36 @@ class _AdminScreenState extends State<AdminScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 25,),
+                      const SizedBox(
+                        height: 25,
+                      ),
                       buildDrawerItem(Icons.dashboard, 'Dashboard', () {}),
-                      const SizedBox(height: 15,),
+                      const SizedBox(
+                        height: 15,
+                      ),
                       buildDrawerItem(Icons.people, 'Loan Request', () {}),
-                      const SizedBox(height: 15,),
-                      buildDrawerItem(Icons.check_circle, 'Approved Loans', () {}),
-                      const SizedBox(height: 15,),
-                      buildDrawerItem(Icons.monetization_on, 'All Loans', () {}),
-                      const SizedBox(height: 15,),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      buildDrawerItem(
+                          Icons.check_circle, 'Approved Loans', () {}),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      buildDrawerItem(
+                          Icons.monetization_on, 'All Loans', () {}),
+                      const SizedBox(
+                        height: 15,
+                      ),
                       buildDrawerItem(Icons.people, 'All Users', () {}),
-                      const SizedBox(height: 15,),
-                      buildDrawerItem(Icons.supervised_user_circle, 'All Agents', () {}),
-                      const SizedBox(height: 15,),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      buildDrawerItem(
+                          Icons.supervised_user_circle, 'All Agents', () {}),
+                      const SizedBox(
+                        height: 15,
+                      ),
                     ],
                   ),
                 ),
@@ -132,31 +165,31 @@ class _AdminScreenState extends State<AdminScreen> {
                       drawHorizontalLine: true,
                       drawVerticalLine: false,
                     ),
-               titlesData: FlTitlesData(
-  leftTitles: SideTitles(
-    showTitles: true,
-    reservedSize: 40,
-    margin: 0,
-    getTitles: (value) {
-      switch (value.toInt()) {
-        case 0:
-          return '0';
-        case 20:
-          return '2023';
-        case 40:
-          return '2024';
-        case 60:
-          return '2025';
-        case 80:
-          return '2026';
-        case 100:
-          return '2027';
-        default:
-          return '';
-      }
-    },
-  ),
-  ),
+                    titlesData: FlTitlesData(
+                      leftTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 40,
+                        margin: 0,
+                        getTitles: (value) {
+                          switch (value.toInt()) {
+                            case 0:
+                              return '0';
+                            case 20:
+                              return '2023';
+                            case 40:
+                              return '2024';
+                            case 60:
+                              return '2025';
+                            case 80:
+                              return '2026';
+                            case 100:
+                              return '2027';
+                            default:
+                              return '';
+                          }
+                        },
+                      ),
+                    ),
                     borderData: FlBorderData(
                       show: false,
                     ),
@@ -312,4 +345,3 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 }
-

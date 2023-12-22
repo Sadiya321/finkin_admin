@@ -1,5 +1,4 @@
-
-import 'package:finkin_admin/registration/login.dart';
+import 'package:finkin_admin/login/views/login_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
-      home:  const LoginScreen(), 
+      home: const LoginView(),
     );
   }
 }

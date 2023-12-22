@@ -1,16 +1,18 @@
-import 'package:finkin_admin/admin/admin_screen.dart';
-import 'package:finkin_admin/screencolor/screen_color.dart';
+import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+import '../../admin_dashboard/views/admin_view.dart';
+
+class LoginView extends StatefulWidget {
+  const LoginView({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginViewState createState() => _LoginViewState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginViewState extends State<LoginView>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
 
@@ -82,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               controller: phoneNumberController,
                               keyboardType: TextInputType.phone,
                               inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9]')),
                                 LengthLimitingTextInputFormatter(10),
                               ],
                               decoration: InputDecoration(
@@ -90,7 +93,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 12),
                                 prefixIcon: const Icon(Icons.phone),
                               ),
                             ),
@@ -112,7 +116,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.0),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 12),
                             prefixIcon: const Icon(Icons.keyboard),
                           ),
                         ),
@@ -124,10 +129,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           String otp = otpController.text;
                           print('Formatted Phone Number: $phoneNumber');
                           print('Entered OTP: $otp');
-          
+
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const AdminScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => const AdminView()),
                           );
                         },
                         child: const Text('Generate OTP'),
@@ -165,8 +171,10 @@ class WaveClipper extends CustomClipper<Path> {
     final path = Path();
     path.moveTo(size.width, size.height);
     path.lineTo(size.width, size.height - 90);
-    path.quadraticBezierTo(size.width - 10, size.height - 60, size.width - 20, size.height - 50);
-    path.quadraticBezierTo(size.width - 30, size.height - 40, size.width - 40, size.height - 50);
+    path.quadraticBezierTo(
+        size.width - 10, size.height - 60, size.width - 20, size.height - 50);
+    path.quadraticBezierTo(
+        size.width - 30, size.height - 40, size.width - 40, size.height - 50);
     path.lineTo(size.width, 0);
     path.lineTo(0, 0);
     path.lineTo(0, size.height);
