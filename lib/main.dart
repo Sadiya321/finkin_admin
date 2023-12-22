@@ -1,4 +1,5 @@
-import 'package:finkin_admin/admin/admin_screen.dart';
+
+import 'package:finkin_admin/registration/login.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,14 +12,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-       
-        
       ),
       debugShowCheckedModeBanner: false,
-      home: const AdminScreen(),
+      home:  const LoginScreen(), 
     );
   }
 }
