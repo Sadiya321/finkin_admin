@@ -1,6 +1,12 @@
 import 'package:finkin_admin/common/utils/screen_color.dart';
+import 'package:finkin_admin/widgets/all_agents_content/all_agents_content.dart';
+import 'package:finkin_admin/widgets/all_loans_content/all_loans_content.dart';
+import 'package:finkin_admin/widgets/all_users_content/all_users_content.dart';
+import 'package:finkin_admin/widgets/approved_loans_content/approved_loans_content.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+
+import '../../widgets/loan_request_content/loan_request_content.dart';
 
 class AdminView extends StatefulWidget {
   const AdminView({Key? key}) : super(key: key);
@@ -11,6 +17,14 @@ class AdminView extends StatefulWidget {
 
 class _AdminViewState extends State<AdminView> {
   List<double> monthlyData = [30, 50, 80, 40, 60, 90, 70, 100, 50, 80, 120, 90];
+
+  String selectedContent = 'Dashboard'; // Initial content
+
+  void onDrawerItemClicked(String content) {
+    setState(() {
+      selectedContent = content;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,29 +58,40 @@ class _AdminViewState extends State<AdminView> {
                     const SizedBox(
                       height: 25,
                     ),
-                    buildDrawerItem(Icons.dashboard, 'Dashboard', () {}),
+                    buildDrawerItem(Icons.dashboard, 'Dashboard', () {
+                      onDrawerItemClicked('Dashboard');
+                    }),
                     const SizedBox(
                       height: 15,
                     ),
-                    buildDrawerItem(Icons.people, 'Loan Request', () {}),
+                    buildDrawerItem(Icons.people, 'Loan Request', () {
+                      onDrawerItemClicked('Loan Request');
+                    }),
                     const SizedBox(
                       height: 15,
                     ),
-                    buildDrawerItem(
-                        Icons.check_circle, 'Approved Loans', () {}),
+                    buildDrawerItem(Icons.check_circle, 'Approved Loans', () {
+                      onDrawerItemClicked('Approved Loans');
+                    }),
                     const SizedBox(
                       height: 15,
                     ),
-                    buildDrawerItem(Icons.monetization_on, 'All Loans', () {}),
+                    buildDrawerItem(Icons.monetization_on, 'All Loans', () {
+                      onDrawerItemClicked('All Loans');
+                    }),
                     const SizedBox(
                       height: 15,
                     ),
-                    buildDrawerItem(Icons.people, 'All Users', () {}),
+                    buildDrawerItem(Icons.people, 'All Users', () {
+                      onDrawerItemClicked('All Users');
+                    }),
                     const SizedBox(
                       height: 15,
                     ),
-                    buildDrawerItem(
-                        Icons.supervised_user_circle, 'All Agents', () {}),
+                    buildDrawerItem(Icons.supervised_user_circle, 'All Agents',
+                        () {
+                      onDrawerItemClicked('All Agents');
+                    }),
                     const SizedBox(
                       height: 15,
                     ),
@@ -74,10 +99,9 @@ class _AdminViewState extends State<AdminView> {
                 ),
               ),
             ),
-            body: buildBody(),
+            body: buildBody(selectedContent),
           );
         } else {
-          // In desktop mode, use Scaffold without an AppBar
           return Scaffold(
             body: Row(
               children: [
@@ -103,30 +127,40 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         height: 25,
                       ),
-                      buildDrawerItem(Icons.dashboard, 'Dashboard', () {}),
+                      buildDrawerItem(Icons.dashboard, 'Dashboard', () {
+                        onDrawerItemClicked('Dashboard');
+                      }),
                       const SizedBox(
                         height: 15,
                       ),
-                      buildDrawerItem(Icons.people, 'Loan Request', () {}),
+                      buildDrawerItem(Icons.people, 'Loan Request', () {
+                        onDrawerItemClicked('Loan Request');
+                      }),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      buildDrawerItem(Icons.check_circle, 'Approved Loans', () {
+                        onDrawerItemClicked('Approved Loans');
+                      }),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      buildDrawerItem(Icons.monetization_on, 'All Loans', () {
+                        onDrawerItemClicked('All Loans');
+                      }),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      buildDrawerItem(Icons.people, 'All Users', () {
+                        onDrawerItemClicked('All Users');
+                      }),
                       const SizedBox(
                         height: 15,
                       ),
                       buildDrawerItem(
-                          Icons.check_circle, 'Approved Loans', () {}),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      buildDrawerItem(
-                          Icons.monetization_on, 'All Loans', () {}),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      buildDrawerItem(Icons.people, 'All Users', () {}),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      buildDrawerItem(
-                          Icons.supervised_user_circle, 'All Agents', () {}),
+                          Icons.supervised_user_circle, 'All Agents', () {
+                        onDrawerItemClicked('All Agents');
+                      }),
                       const SizedBox(
                         height: 15,
                       ),
@@ -134,7 +168,7 @@ class _AdminViewState extends State<AdminView> {
                   ),
                 ),
                 Expanded(
-                  child: buildBody(),
+                  child: buildBody(selectedContent),
                 ),
               ],
             ),
@@ -144,7 +178,26 @@ class _AdminViewState extends State<AdminView> {
     );
   }
 
-  Widget buildBody() {
+  Widget buildBody(String selectedContent) {
+    switch (selectedContent) {
+      case 'Dashboard':
+        return buildDashboardContent();
+      case 'Loan Request':
+        return buildLoanRequestContent();
+      case 'Approved Loans':
+        return buildApprovedLoansContent();
+      case 'All Loans':
+        return buildAllLoansContent();
+      case 'All Users':
+        return buildAllUsersContent();
+      case 'All Agents':
+        return buildAllAgentsContent();
+      default:
+        return buildDefaultContent();
+    }
+  }
+
+  Widget buildDashboardContent() {
     return Stack(
       children: [
         Column(
@@ -230,6 +283,38 @@ class _AdminViewState extends State<AdminView> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget buildLoanRequestContent() {
+    // Implement the content for Loan Request
+    return const LoanRequest();
+  }
+
+  Widget buildApprovedLoansContent() {
+    // Implement the content for Approved Loans
+    return const ApprovedLoans();
+  }
+
+  Widget buildAllLoansContent() {
+    // Implement the content for All Loans
+    return const AllLoans();
+  }
+
+  Widget buildAllUsersContent() {
+    // Implement the content for All Users
+    return const AllUsers();
+  }
+
+  Widget buildAllAgentsContent() {
+    // Implement the content for All Agents
+    return const AllAgents();
+  }
+
+  Widget buildDefaultContent() {
+    // Default content when no specific item is selected
+    return Container(
+      child: Text('Select an item from the drawer to view content.'),
     );
   }
 

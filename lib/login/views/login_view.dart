@@ -1,13 +1,13 @@
+import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../admin_dashboard/views/admin_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginViewState createState() => _LoginViewState();
 }
 
@@ -15,6 +15,10 @@ class _LoginViewState extends State<LoginView>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
+  bool isVerifyingOTP = false;
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -40,13 +44,9 @@ class _LoginViewState extends State<LoginView>
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController phoneNumberController = TextEditingController();
-    TextEditingController otpController = TextEditingController();
-
     return Scaffold(
       body: Stack(
         children: [
-          // First Container
           Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
@@ -58,87 +58,120 @@ class _LoginViewState extends State<LoginView>
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      FadeTransition(
-                        opacity: _fadeInAnimation,
-                        child: Image.asset(
-                          'assets/images/hill.png',
-                          width: 250,
-                          height: 350,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        FadeTransition(
+                          opacity: _fadeInAnimation,
+                          child: Image.asset(
+                            'assets/images/hill.png',
+                            width: 250,
+                            height: 350,
+                          ),
                         ),
-                      ),
-                      const Text(
-                        'Admin Login',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                        const Text(
+                          'Admin Login',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: phoneNumberController,
-                              keyboardType: TextInputType.phone,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9]')),
-                                LengthLimitingTextInputFormatter(10),
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Phone Number',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.0),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: phoneNumberController,
+                                keyboardType: TextInputType.phone,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'[0-9]')),
+                                  LengthLimitingTextInputFormatter(10),
+                                ],
+                                // validator: (value) {
+                                //   if (value == null || value.isEmpty) {
+                                //     return 'Please enter a phone number';
+                                //   }
+                                //   return null;
+                                // },
+                                decoration: InputDecoration(
+                                  labelText: 'Phone Number',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 12),
+                                  prefixIcon: const Icon(Icons.phone),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16, horizontal: 12),
-                                prefixIcon: const Icon(Icons.phone),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextField(
-                          controller: otpController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                            LengthLimitingTextInputFormatter(6),
                           ],
-                          decoration: InputDecoration(
-                            labelText: 'OTP',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextFormField(
+                            controller: otpController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]')),
+                              LengthLimitingTextInputFormatter(6),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'OTP',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 12),
+                              prefixIcon: const Icon(Icons.keyboard),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 12),
-                            prefixIcon: const Icon(Icons.keyboard),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          String phoneNumber = phoneNumberController.text;
-                          String otp = otpController.text;
-                          print('Formatted Phone Number: $phoneNumber');
-                          print('Entered OTP: $otp');
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                ScreenColor.primary),
+                          ),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              if (!isVerifyingOTP) {
+                                String phoneNumber = phoneNumberController.text;
+                                String otp = otpController.text;
+                                print('Formatted Phone Number: $phoneNumber');
+                                print('Entered OTP: $otp');
 
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AdminView()),
-                          );
-                        },
-                        child: const Text('Generate OTP'),
-                      ),
-                    ],
+                                setState(() {
+                                  isVerifyingOTP = true;
+                                });
+                              } else {
+                                String otp = otpController.text;
+                                print('Entered OTP: $otp');
+                                setState(() {
+                                  isVerifyingOTP = false;
+                                });
+
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AdminView(),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: Text(
+                            isVerifyingOTP ? 'Verify OTP' : 'Generate OTP',
+                            style:
+                                const TextStyle(color: ScreenColor.secondary),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -152,9 +185,22 @@ class _LoginViewState extends State<LoginView>
               child: Container(
                 color: ScreenColor.primary,
                 padding: const EdgeInsets.all(200.0),
-                child: const Text(
-                  ' Welcome',
-                  style: TextStyle(fontSize: 25, color: ScreenColor.textLight),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ' Welcome',
+                      style:
+                          TextStyle(fontSize: 25, color: ScreenColor.textLight),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Unlock a world of data-driven insights, instant updates, and streamlined loan management. Securely log in to embark on a seamless journey toward mastering the art of lending.',
+                      style:
+                          TextStyle(fontSize: 18, color: ScreenColor.secondary),
+                    ),
+                  ],
                 ),
               ),
             ),
