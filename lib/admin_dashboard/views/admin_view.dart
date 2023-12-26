@@ -18,7 +18,7 @@ class AdminView extends StatefulWidget {
 class _AdminViewState extends State<AdminView> {
   List<double> monthlyData = [30, 50, 80, 40, 60, 90, 70, 100, 50, 80, 120, 90];
 
-  String selectedContent = 'Dashboard'; // Initial content
+  String selectedContent = 'Dashboard'; 
 
   void onDrawerItemClicked(String content) {
     setState(() {
@@ -287,35 +287,27 @@ class _AdminViewState extends State<AdminView> {
   }
 
   Widget buildLoanRequestContent() {
-    // Implement the content for Loan Request
     return const LoanRequest();
   }
 
   Widget buildApprovedLoansContent() {
-    // Implement the content for Approved Loans
     return const ApprovedLoans();
   }
 
   Widget buildAllLoansContent() {
-    // Implement the content for All Loans
     return const AllLoans();
   }
 
   Widget buildAllUsersContent() {
-    // Implement the content for All Users
     return const AllUsers();
   }
 
   Widget buildAllAgentsContent() {
-    // Implement the content for All Agents
     return const AllAgents();
   }
 
   Widget buildDefaultContent() {
-    // Default content when no specific item is selected
-    return Container(
-      child: Text('Select an item from the drawer to view content.'),
-    );
+    return const Text('Select an item from the drawer to view content.');
   }
 
   Widget buildContainer() {
