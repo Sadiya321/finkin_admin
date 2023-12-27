@@ -1,3 +1,4 @@
+import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
 import 'package:finkin_admin/login/views/login_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginView(),
+      home: const AdminView(),
     );
   }
 }

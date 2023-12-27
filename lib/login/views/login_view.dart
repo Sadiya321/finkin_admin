@@ -1,33 +1,33 @@
-import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
-import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:flutter/material.dart';
+import 'package:finkin_admin/common/utils/screen_color.dart';
+import 'package:finkin_admin/controller/login_controller/login_controller.dart';
 import 'package:flutter/services.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LoginViewState createState() => _LoginViewState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _LoginViewState extends State<LoginView>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeInAnimation;
-  bool isVerifyingOTP = false;
+class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin {
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController otpController = TextEditingController();
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool canShowOTPField = false;
+  late FirebaseAuthentication _firebaseAuth;
+  late AnimationController _animationController;
+  late Animation<double> _fadeInAnimation;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    _firebaseAuth = FirebaseAuthentication(context);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     );
-    _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.5).animate(
+      _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.5).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.easeIn,
@@ -35,8 +35,9 @@ class _LoginViewState extends State<LoginView>
     );
     _animationController.forward();
   }
-
-  @override
+  
+  
+   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
@@ -59,117 +60,46 @@ class _LoginViewState extends State<LoginView>
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Form(
-                    key: _formKey,
+                     key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         FadeTransition(
-                          opacity: _fadeInAnimation,
-                          child: Image.asset(
-                            'assets/images/hill.png',
-                            width: 250,
-                            height: 350,
-                          ),
-                        ),
-                        const Text(
-                          'Admin Login',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                              opacity: _fadeInAnimation,
+                              child: Image.asset(
+                                'assets/images/hill.png',
+                                width: 250,
+                                height: 350,
+                              ),
+                            ),
+                          const Text(
+                              'Admin Login',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          
                         const SizedBox(height: 20),
+
                         Row(
                           children: [
                             Expanded(
-                              child: TextFormField(
-                                controller: phoneNumberController,
-                                keyboardType: TextInputType.phone,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'[0-9]')),
-                                  LengthLimitingTextInputFormatter(10),
-                                ],
-                                // validator: (value) {
-                                //   if (value == null || value.isEmpty) {
-                                //     return 'Please enter a phone number';
-                                //   }
-                                //   return null;
-                                // },
-                                decoration: InputDecoration(
-                                  labelText: 'Phone Number',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16, horizontal: 12),
-                                  prefixIcon: const Icon(Icons.phone),
-                                ),
+                              child: buildTextField(
+                                "Phone Number",
+                                phoneNumberController,
+                                Icons.phone,
+                                10
+                                
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextFormField(
-                            controller: otpController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'[0-9]')),
-                              LengthLimitingTextInputFormatter(6),
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'OTP',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 12),
-                              prefixIcon: const Icon(Icons.keyboard),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                ScreenColor.primary),
-                          ),
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              if (!isVerifyingOTP) {
-                                String phoneNumber = phoneNumberController.text;
-                                String otp = otpController.text;
-                                print('Formatted Phone Number: $phoneNumber');
-                                print('Entered OTP: $otp');
-
-                                setState(() {
-                                  isVerifyingOTP = true;
-                                });
-                              } else {
-                                String otp = otpController.text;
-                                print('Entered OTP: $otp');
-                                setState(() {
-                                  isVerifyingOTP = false;
-                                });
-
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const AdminView(),
-                                  ),
-                                );
-                              }
-                            }
-                          },
-                          child: Text(
-                            isVerifyingOTP ? 'Verify OTP' : 'Generate OTP',
-                            style:
-                                const TextStyle(color: ScreenColor.secondary),
-                          ),
-                        ),
+                        if (canShowOTPField)
+                          buildTextField("OTP", otpController, Icons.timer,6),
+                        !canShowOTPField
+                            ? buildSendOTPBtn("Send OTP")
+                            : buildSubmitBtn("Submit"),
                       ],
                     ),
                   ),
@@ -191,14 +121,14 @@ class _LoginViewState extends State<LoginView>
                   children: [
                     Text(
                       ' Welcome',
-                      style:
-                          TextStyle(fontSize: 25, color: ScreenColor.textLight),
+                      style: TextStyle(
+                          fontSize: 25, color: ScreenColor.textLight),
                     ),
                     SizedBox(height: 10),
                     Text(
                       'Unlock a world of data-driven insights, instant updates, and streamlined loan management. Securely log in to embark on a seamless journey toward mastering the art of lending.',
-                      style:
-                          TextStyle(fontSize: 18, color: ScreenColor.secondary),
+                      style: TextStyle(
+                          fontSize: 18, color: ScreenColor.secondary),
                     ),
                   ],
                 ),
@@ -209,6 +139,56 @@ class _LoginViewState extends State<LoginView>
       ),
     );
   }
+
+  Widget buildTextField(String label, TextEditingController controller, IconData icon, int maxLength) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: TextField(
+      controller: controller,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+        LengthLimitingTextInputFormatter(maxLength),
+      ],
+      decoration: InputDecoration(
+        labelText: label,
+        icon: Icon(icon),
+      ),
+    ),
+  );
+}
+
+
+  Widget buildSendOTPBtn(String text) => ElevatedButton(
+        onPressed: () async {
+          try {
+            var confirmationResult =
+                await _firebaseAuth.sendOTP(phoneNumberController.text);
+            setState(() {
+              canShowOTPField = !canShowOTPField;
+            });
+            // Do something with confirmationResult if needed
+          } catch (e) {
+            // Handle error
+            print("Error sending OTP: $e");
+          }
+        },
+        child: Text(text),
+      );
+
+  Widget buildSubmitBtn(String text) => ElevatedButton(
+        onPressed: () async {
+          try {
+            var confirmationResult =
+                await _firebaseAuth.sendOTP(phoneNumberController.text);
+            await _firebaseAuth.authenticateMe(
+                confirmationResult, otpController.text);
+          } catch (e) {
+            // Handle error
+            print("Error authenticating: $e");
+          }
+        },
+        child: Text(text),
+      );
 }
 
 class WaveClipper extends CustomClipper<Path> {
