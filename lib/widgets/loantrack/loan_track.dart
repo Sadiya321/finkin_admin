@@ -44,18 +44,21 @@ class LoanTrack extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              
               Row(
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(22),
-                    child: Container(
+                    child: SizedBox(
                       width: 48,
                       height: 48,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(imageAsset),
-                          fit: BoxFit.cover,
-                        ),
+                     
+                      child: Image.network(
+                        imageAsset,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.cover,
+                       
                       ),
                     ),
                   ),
@@ -132,6 +135,7 @@ class LoanTrack extends StatelessWidget {
               ),
             ],
           ),
+
         ),
       ),
     );
