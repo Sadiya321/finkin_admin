@@ -17,12 +17,37 @@ class LoanRequest extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(
-            value: 0.5,
-            semanticsLabel: 'Loading',
-            backgroundColor: Colors.grey,
-          );
+          return const Center(
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      SizedBox(
+        width: 60.0,
+        height: 60.0,
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.grey,
+          value: 0.5,
+        ),
+      ),
+      SizedBox(height: 10), 
+      Text(
+        'Loading', 
+        style: TextStyle(color: Colors.black),
+      ),
+    ],
+  ),
+);
+
         }
+         else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text('No Loan Request found.'),
+            );
+          }
 
         List<LoanModel> loans = snapshot.data?.docs
                 .map((DocumentSnapshot<Map<String, dynamic>> doc) =>
