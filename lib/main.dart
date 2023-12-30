@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
-      home: const AdminView(),
+      home: const AdminView(documentId: '',),
     );
   }
 }

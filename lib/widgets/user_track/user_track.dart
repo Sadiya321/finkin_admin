@@ -11,7 +11,7 @@ class User {
 class UserGridItem extends StatelessWidget {
   final User user;
 
-  const UserGridItem({super.key, required this.user});
+  const UserGridItem({super.key, required this.user, required String searchQuery});
 
   @override
   Widget build(BuildContext context) {

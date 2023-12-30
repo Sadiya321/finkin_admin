@@ -1,80 +1,128 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
+import 'package:finkin_admin/loan_info_display/info_display.dart';
 import 'package:finkin_admin/loan_model/loan_model.dart';
-import 'package:finkin_admin/res/constants/enums/enums.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class LoanRequest extends StatelessWidget {
+class LoanRequest extends StatefulWidget {
   const LoanRequest({Key? key});
 
   @override
+  _LoanRequestState createState() => _LoanRequestState();
+}
+
+class _LoanRequestState extends State<LoanRequest> {
+  late List<LoanModel> allLoans;
+  late List<LoanModel> displayedLoans;
+
+  @override
+  void initState() {
+    super.initState();
+    allLoans = [];
+    displayedLoans = [];
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection('Loan').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-  child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      SizedBox(
-        width: 60.0,
-        height: 60.0,
-        child: CircularProgressIndicator(
-          backgroundColor: Colors.grey,
-          value: 0.5,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Loan Requests'),
+        actions: [
+          Container(
+            width: 250.0,
+            margin: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Search...',
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        displayedLoans = allLoans
+                            .where((loan) =>
+                                loan.userName
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()) ||
+                                loan.loanType
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    // You can add additional search functionality here if needed
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      SizedBox(height: 10), 
-      Text(
-        'Loading', 
-        style: TextStyle(color: Colors.black),
-      ),
-    ],
-  ),
-);
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance.collection('Loan').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
 
-        }
-         else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
             );
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No Loan Request found.'),
+              child: Text('No Loan Requests found.'),
             );
           }
 
-        List<LoanModel> loans = snapshot.data?.docs
-                .map((DocumentSnapshot<Map<String, dynamic>> doc) =>
-                    LoanModel.fromSnapshot(doc))
-                .toList() ??
-            [];
-        List<LoanModel> pendingLoans =
-            loans.where((loan) => loan.status == LoanStatus.pending).toList();
+          allLoans = snapshot.data?.docs
+                  .map((DocumentSnapshot<Map<String, dynamic>> doc) =>
+                      LoanModel.fromSnapshot(doc))
+                  .toList() ??
+              [];
+          if (displayedLoans.isEmpty) {
+            displayedLoans = List.from(allLoans);
+          }
+          final data = snapshot.requireData;
+            List<LoanModel> loanItems = snapshot.data!.docs
+                .map((DocumentSnapshot doc) => LoanModel.fromSnapshot(
+                    doc as DocumentSnapshot<Map<String, dynamic>>))
+                .toList();
 
-        return Center(
-          child: ListView.builder(
-            itemCount: pendingLoans.length,
+          return ListView.builder(
+            itemCount: displayedLoans.length,
             itemBuilder: (context, index) {
+              final documentId = data.docs[index].id;
               return LoanTrack(
-                imageAsset: pendingLoans[index].userImage,
-                
-                userName: pendingLoans[index].userName,
-                loanType: pendingLoans[index].loanType,
-                onPressed: () {},
-                date: pendingLoans[index].date,
-                icon: pendingLoans[index].icon,
-                status: pendingLoans[index].status,
+                imageAsset: displayedLoans[index].userImage,
+                userName: displayedLoans[index].userName,
+                loanType: displayedLoans[index].loanType,
+                onPressed: () {
+ 
+  Navigator.of(context).push(
+    MaterialPageRoute(builder: (context) => InfoDisplay( documentId:documentId,)),
+  );
+},
+                date: displayedLoans[index].date,
+                icon: displayedLoans[index].icon,
+                status: displayedLoans[index].status,
               );
             },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

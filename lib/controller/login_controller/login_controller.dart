@@ -29,7 +29,7 @@ class FirebaseAuthentication {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AdminView(),
+            builder: (context) => AdminView(documentId: '',),
           ),
         );
       } else {
@@ -39,7 +39,7 @@ class FirebaseAuthentication {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AdminView(),
+            builder: (context) => AdminView(documentId: '',),
           ),
         );
       }

@@ -1,4 +1,5 @@
 import 'package:finkin_admin/common/utils/screen_color.dart';
+import 'package:finkin_admin/loan_info_display/info_display.dart';
 import 'package:finkin_admin/widgets/all_agents_content/all_agents_content.dart';
 import 'package:finkin_admin/widgets/all_loans_content/all_loans_content.dart';
 import 'package:finkin_admin/widgets/all_users_content/all_users_content.dart';
@@ -9,7 +10,8 @@ import 'package:flutter/material.dart';
 import '../../widgets/loan_request_content/loan_request_content.dart';
 
 class AdminView extends StatefulWidget {
-  const AdminView({Key? key}) : super(key: key);
+  final String documentId;
+  const AdminView({Key? key,required this.documentId,}) : super(key: key);
 
   @override
   State<AdminView> createState() => _AdminViewState();
@@ -95,6 +97,7 @@ class _AdminViewState extends State<AdminView> {
                     const SizedBox(
                       height: 15,
                     ),
+                    
                   ],
                 ),
               ),
@@ -164,6 +167,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         height: 15,
                       ),
+                      
                     ],
                   ),
                 ),
@@ -192,6 +196,7 @@ class _AdminViewState extends State<AdminView> {
         return buildAllUsersContent();
       case 'All Agents':
         return buildAllAgentsContent();
+       
       default:
         return buildDefaultContent();
     }

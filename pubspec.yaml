@@ -48,6 +48,7 @@ dependencies:
   get: ^4.6.6
   firebase_auth: ^4.15.3
   cloud_firestore: ^4.13.6
+  horizontal_stepper_flutter: ^1.0.3
   # intl_phone_number_input: ^4.0.6
 
 dev_dependencies:

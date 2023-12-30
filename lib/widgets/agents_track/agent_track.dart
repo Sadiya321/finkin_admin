@@ -10,11 +10,14 @@ class Agent {
 
 class AgentGridItem extends StatelessWidget {
   final Agent agent;
+  final String searchQuery; 
+  
+  const AgentGridItem({super.key, required this.agent, required this.searchQuery});
 
-  const AgentGridItem({super.key, required this.agent});
 
   @override
   Widget build(BuildContext context) {
+    
     return Column(
       children: [
         Container(
