@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/controller/user_info_controller/info_controller.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ class InfoDisplay extends StatefulWidget {
 }
 
 class _InfoDisplayState extends State<InfoDisplay> {
+  static final GlobalKey<_InfoDisplayState> globalKey =
+      GlobalKey<_InfoDisplayState>();
   bool isPersonalDetailsSelected = true;
   final UserInfoController userInfoController = Get.put(UserInfoController());
   int currentStep = 0;
@@ -31,6 +34,10 @@ class _InfoDisplayState extends State<InfoDisplay> {
       print("Error loading image: $e");
       return const AssetImage('assets/images/contact.svg');
     }
+  }
+
+  void refresh() {
+    setState(() {});
   }
 
   void _showImageDialog(String imageUrl) {
@@ -239,7 +246,12 @@ class _InfoDisplayState extends State<InfoDisplay> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    _approveLoan(widget.documentId);
+                                    // Check if this prints
+
+                                    Navigator.pop(context);
+                                  },
                                   style: TextButton.styleFrom(
                                     fixedSize: const Size(150, 40),
                                     backgroundColor: ScreenColor.icon,
@@ -256,7 +268,9 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    _denyLoan(widget.documentId);
+                                  },
                                   style: TextButton.styleFrom(
                                     fixedSize: const Size(150, 40),
                                     backgroundColor: ScreenColor.errorbar,
@@ -713,7 +727,9 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                 children: [
                                   TextButton(
                                     onPressed: () {
-                                      // Handle Approve Loan button click
+                                      _approveLoan(widget.documentId);
+
+                                      Navigator.pop(context);
                                     },
                                     style: TextButton.styleFrom(
                                       fixedSize: const Size(150, 40),
@@ -736,6 +752,7 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                   TextButton(
                                     onPressed: () {
                                       // Handle Cancel Loan button click
+                                      _denyLoan(widget.documentId);
                                     },
                                     style: TextButton.styleFrom(
                                       fixedSize: const Size(150, 40),
@@ -1049,6 +1066,44 @@ class _InfoDisplayState extends State<InfoDisplay> {
         );
       }
     });
+  }
+
+  void _approveLoan(String documentId) async {
+    try {
+      // Get a reference to the Firestore document using the provided documentId
+      final DocumentReference userDocument =
+          FirebaseFirestore.instance.collection('Loan').doc(documentId);
+
+      // Update the value of the 'loanStatus' field to 'approved'
+      await userDocument.update({
+        'Status': 'approved',
+      });
+
+      // Display a success message or perform any other action
+      print('Loan approved for documentId: $documentId');
+    } catch (error) {
+      // Handle errors, display an error message, or perform any other action
+      print('Error approving loan: $error');
+    }
+  }
+
+  void _denyLoan(String documentId) async {
+    try {
+      // Get a reference to the Firestore document using the provided documentId
+      final DocumentReference userDocument =
+          FirebaseFirestore.instance.collection('Loan').doc(documentId);
+
+      // Update the value of the 'loanStatus' field to 'approved'
+      await userDocument.update({
+        'Status': 'denied',
+      });
+
+      // Display a success message or perform any other action
+      print('Loan denied for documentId: $documentId');
+    } catch (error) {
+      // Handle errors, display an error message, or perform any other action
+      print('Error approving loan: $error');
+    }
   }
 }
 

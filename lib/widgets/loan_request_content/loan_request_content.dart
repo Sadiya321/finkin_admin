@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
-import 'package:finkin_admin/loan_info_display/info_display.dart';
 import 'package:finkin_admin/loan_model/loan_model.dart';
+import 'package:finkin_admin/res/constants/enums/enums.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
 
+import '../../loan_info_display/info_display.dart';
+
 class LoanRequest extends StatefulWidget {
-  const LoanRequest({Key? key});
+  const LoanRequest({Key? key}) : super(key: key);
 
   @override
   _LoanRequestState createState() => _LoanRequestState();
@@ -27,7 +28,7 @@ class _LoanRequestState extends State<LoanRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Loan Requests'),
+        title: const Text('Requests for Loans'),
         actions: [
           Container(
             width: 250.0,
@@ -83,38 +84,41 @@ class _LoanRequestState extends State<LoanRequest> {
             );
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No Loan Requests found.'),
+              child: Text('No Approved Loans found.'),
             );
           }
 
           allLoans = snapshot.data?.docs
                   .map((DocumentSnapshot<Map<String, dynamic>> doc) =>
                       LoanModel.fromSnapshot(doc))
+                  .where((loan) => loan.status == LoanStatus.pending)
                   .toList() ??
               [];
+
+          // Initially, set displayedLoans to allLoans
           if (displayedLoans.isEmpty) {
             displayedLoans = List.from(allLoans);
           }
-          final data = snapshot.requireData;
-            List<LoanModel> loanItems = snapshot.data!.docs
-                .map((DocumentSnapshot doc) => LoanModel.fromSnapshot(
-                    doc as DocumentSnapshot<Map<String, dynamic>>))
-                .toList();
 
           return ListView.builder(
             itemCount: displayedLoans.length,
             itemBuilder: (context, index) {
-              final documentId = data.docs[index].id;
+              final documentId = displayedLoans[index].id;
               return LoanTrack(
                 imageAsset: displayedLoans[index].userImage,
                 userName: displayedLoans[index].userName,
                 loanType: displayedLoans[index].loanType,
                 onPressed: () {
- 
-  Navigator.of(context).push(
-    MaterialPageRoute(builder: (context) => InfoDisplay( documentId:documentId,)),
-  );
-},
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => InfoDisplay(
+                        documentId: documentId!,
+                      ),
+                    ),
+                  );
+                  // Handle the onPressed event
+                  // You may want to navigate to a detailed view or perform some action
+                },
                 date: displayedLoans[index].date,
                 icon: displayedLoans[index].icon,
                 status: displayedLoans[index].status,

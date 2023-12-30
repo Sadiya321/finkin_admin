@@ -47,7 +47,8 @@ class _AllUsersState extends State<AllUsers> {
 
           allUsers = snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-            return User(data['UserName'], data['UserImage']);
+            return User(data['UserName'], data['UserImage'], data['Email'],
+                data['Phone']);
           }).toList();
 
           displayedUsers = isSearching ? _performSearch() : allUsers;
@@ -142,7 +143,55 @@ class _AllUsersState extends State<AllUsers> {
       itemCount: displayedUsers.length,
       itemBuilder: (context, index) {
         return UserGridItem(
-          user: displayedUsers[index], searchQuery: '',
+          onPressed: () {
+            // Handle the onPressed functionality here
+            _showAgentDetailsDialog(context, displayedUsers[index]);
+          },
+          user: displayedUsers[index],
+          searchQuery: '',
+        );
+      },
+    );
+  }
+
+  void _showAgentDetailsDialog(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 40.0,
+                backgroundImage: NetworkImage(user.userImage),
+              ),
+              const SizedBox(height: 16.0),
+              Text(
+                user.username,
+                style: const TextStyle(
+                    fontSize: 20.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                user.email, // Replace with the actual email address
+                style: const TextStyle(fontSize: 16.0),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                user.phone, // Replace with the actual phone number
+                style: const TextStyle(fontSize: 16.0),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
         );
       },
     );
@@ -188,8 +237,8 @@ class UserSearchDelegate extends SearchDelegate<String> {
 
   Widget _buildSearchResults() {
     final List<User> searchResults = users
-        .where((user) =>
-            user.username.toLowerCase().contains(query.toLowerCase()))
+        .where(
+            (user) => user.username.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     return GridView.builder(
@@ -201,7 +250,8 @@ class UserSearchDelegate extends SearchDelegate<String> {
       itemCount: searchResults.length,
       itemBuilder: (context, index) {
         return UserGridItem(
-          user: searchResults[index], searchQuery: '',
+          user: searchResults[index],
+          searchQuery: '',
         );
       },
     );

@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/widgets/agents_track/agent_track.dart';
@@ -31,7 +30,8 @@ class _AllAgentsState extends State<AllAgents> {
     setState(() {
       allAgents = querySnapshot.docs.map((DocumentSnapshot document) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-        return Agent(data['Name'], data['ImageUrl']);
+        return Agent(
+            data['Name'], data['ImageUrl'], data['Email'], data['Phone']);
       }).toList();
 
       displayedAgents = allAgents; // Set displayedAgents to allAgents initially
@@ -164,8 +164,55 @@ class _AllAgentsState extends State<AllAgents> {
       itemCount: displayedAgents.length,
       itemBuilder: (context, index) {
         return AgentGridItem(
+          onPressed: () {
+            // Handle the onPressed functionality here
+            _showAgentDetailsDialog(context, displayedAgents[index]);
+          },
           agent: displayedAgents[index],
           searchQuery: '',
+        );
+      },
+    );
+  }
+
+  void _showAgentDetailsDialog(BuildContext context, Agent agent) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 40.0,
+                backgroundImage: NetworkImage(agent.agentImage),
+              ),
+              const SizedBox(height: 16.0),
+              Text(
+                agent.agentname,
+                style: const TextStyle(
+                    fontSize: 20.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                agent.email, // Replace with the actual email address
+                style: const TextStyle(fontSize: 16.0),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                agent.phone, // Replace with the actual phone number
+                style: const TextStyle(fontSize: 16.0),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
         );
       },
     );
