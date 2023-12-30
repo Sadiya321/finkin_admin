@@ -3,6 +3,8 @@ import 'package:finkin_admin/loan_model/loan_model.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
 
+import '../../loan_info_display/other_display.dart';
+
 class AllLoans extends StatefulWidget {
   const AllLoans({Key? key}) : super(key: key);
 
@@ -99,12 +101,22 @@ class _AllLoansState extends State<AllLoans> {
           return ListView.builder(
             itemCount: displayedLoans.length,
             itemBuilder: (context, index) {
+              final documentId = displayedLoans[index].id;
               return LoanTrack(
                 imageAsset: displayedLoans[index].userImage,
                 userName: displayedLoans[index].userName,
                 loanType: displayedLoans[index].loanType,
                 onPressed: () {
-                 },
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => OtherDisplay(
+                        documentId: documentId!,
+                      ),
+                    ),
+                  );
+                  // Handle the onPressed event
+                  // You may want to navigate to a detailed view or perform some action
+                },
                 date: displayedLoans[index].date,
                 icon: displayedLoans[index].icon,
                 status: displayedLoans[index].status,

@@ -4,6 +4,8 @@ import 'package:finkin_admin/res/constants/enums/enums.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
 
+import '../../loan_info_display/other_display.dart';
+
 class ApprovedLoans extends StatefulWidget {
   const ApprovedLoans({Key? key}) : super(key: key);
 
@@ -101,11 +103,19 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
           return ListView.builder(
             itemCount: displayedLoans.length,
             itemBuilder: (context, index) {
+              final documentId = displayedLoans[index].id;
               return LoanTrack(
                 imageAsset: displayedLoans[index].userImage,
                 userName: displayedLoans[index].userName,
                 loanType: displayedLoans[index].loanType,
                 onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => OtherDisplay(
+                        documentId: documentId!,
+                      ),
+                    ),
+                  );
                   // Handle the onPressed event
                   // You may want to navigate to a detailed view or perform some action
                 },
