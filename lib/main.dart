@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+      
       ),
       debugShowCheckedModeBanner: false,
       home: const AdminView(documentId: '',),

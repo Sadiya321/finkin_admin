@@ -14,6 +14,8 @@ class _AllAgentsState extends State<AllAgents> {
   late List<Agent> allAgents;
   late List<Agent> displayedAgents;
   bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
+  bool agentsLoaded = false;
 
   @override
   void initState() {
@@ -24,18 +26,21 @@ class _AllAgentsState extends State<AllAgents> {
   }
 
   void _loadAllAgents() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('Agents').get();
+    if (!agentsLoaded) {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Agents').get();
 
-    setState(() {
-      allAgents = querySnapshot.docs.map((DocumentSnapshot document) {
-        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-        return Agent(
-            data['Name'], data['ImageUrl'], data['Email'], data['Phone']);
-      }).toList();
+      setState(() {
+        allAgents = querySnapshot.docs.map((DocumentSnapshot document) {
+          Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+          return Agent(
+              data['Name'], data['ImageUrl'], data['Email'], data['Phone']);
+        }).toList();
 
-      displayedAgents = allAgents; // Set displayedAgents to allAgents initially
-    });
+        displayedAgents = allAgents; // Set displayedAgents to allAgents initially
+        agentsLoaded = true;
+      });
+    }
   }
 
   void _updateDisplayedAgents(String query) {
@@ -58,7 +63,7 @@ class _AllAgentsState extends State<AllAgents> {
       appBar: AppBar(
         title: Text(isSearching ? 'Search Results' : 'All Agents'),
         actions: [
-          _buildSearchButton(),
+          _buildSearchBar(),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -74,45 +79,43 @@ class _AllAgentsState extends State<AllAgents> {
             );
           }
 
+          _loadAllAgents(); // Ensure agents are loaded
+
           return _buildAgentGridView();
         },
       ),
     );
   }
 
-  Widget _buildSearchButton() {
+  Widget _buildSearchBar() {
     return Container(
-      width: 250.0,
+      width: 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(18.0),
       ),
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Search...',
-                hintStyle: TextStyle(color: ScreenColor.textLight),
-                border: InputBorder.none,
-              ),
-              style: const TextStyle(color: ScreenColor.textLight),
-              onChanged: (value) {
-                setState(() {
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
                   isSearching = value.isNotEmpty;
-                });
-                _updateDisplayedAgents(value);
-              },
+                  _updateDisplayedAgents(value);
+                },
+              ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.search, color: ScreenColor.textLight),
-            onPressed: () {
-              setState(() {
-                isSearching = true;
-              });
-            },
+            icon: const Icon(Icons.search),
+            onPressed: () {},
           ),
         ],
       ),
@@ -155,6 +158,14 @@ class _AllAgentsState extends State<AllAgents> {
   }
 
   Widget _buildAgentGridView() {
+    if (isSearching && displayedAgents.isEmpty) {
+      return const Center(
+        child: Text(
+          'Search results not found',
+          style: TextStyle(fontSize: 23),
+        ),
+      );
+    }
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
@@ -165,7 +176,6 @@ class _AllAgentsState extends State<AllAgents> {
       itemBuilder: (context, index) {
         return AgentGridItem(
           onPressed: () {
-            // Handle the onPressed functionality here
             _showAgentDetailsDialog(context, displayedAgents[index]);
           },
           agent: displayedAgents[index],

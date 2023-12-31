@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/loan_model/loan_model.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class AllLoans extends StatefulWidget {
 class _AllLoansState extends State<AllLoans> {
   late List<LoanModel> allLoans;
   late List<LoanModel> displayedLoans;
+   bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -27,47 +30,9 @@ class _AllLoansState extends State<AllLoans> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Loans'),
+        title: Text(isSearching ? 'Search Results' : 'All Loans'),
         actions: [
-          Container(
-            width: 250.0,
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Search...',
-                      border: InputBorder.none,
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        displayedLoans = allLoans
-                            .where((loan) =>
-                                loan.userName
-                                    .toLowerCase()
-                                    .contains(value.toLowerCase()) ||
-                                loan.loanType
-                                    .toLowerCase()
-                                    .contains(value.toLowerCase()))
-                            .toList();
-                      });
-                    },
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    // You can add additional search functionality here if needed
-                  },
-                ),
-              ],
-            ),
-          ),
+          _buildSearchBar(),
         ],
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -78,9 +43,7 @@ class _AllLoansState extends State<AllLoans> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return _buildLoadingIndicator();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Text('No Loan found.'),
@@ -93,37 +56,106 @@ class _AllLoansState extends State<AllLoans> {
                   .toList() ??
               [];
 
-          // Initially, set displayedLoans to allLoans
-          if (displayedLoans.isEmpty) {
-            displayedLoans = List.from(allLoans);
-          }
+          // Update displayedLoans based on the search criteria
+          displayedLoans = allLoans
+              .where((loan) =>
+                  loan.userName
+                      .toLowerCase()
+                      .contains(searchController.text.toLowerCase()) ||
+                  loan.loanType
+                      .toLowerCase()
+                      .contains(searchController.text.toLowerCase()))
+              .toList();
 
-          return ListView.builder(
-            itemCount: displayedLoans.length,
-            itemBuilder: (context, index) {
-              final documentId = displayedLoans[index].id;
-              return LoanTrack(
-                imageAsset: displayedLoans[index].userImage,
-                userName: displayedLoans[index].userName,
-                loanType: displayedLoans[index].loanType,
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => OtherDisplay(
-                        documentId: documentId!,
-                      ),
-                    ),
-                  );
-                  // Handle the onPressed event
-                  // You may want to navigate to a detailed view or perform some action
-                },
-                date: displayedLoans[index].date,
-                icon: displayedLoans[index].icon,
-                status: displayedLoans[index].status,
-              );
-            },
-          );
+          return displayedLoans.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Search results not found',
+                    style: TextStyle(fontSize: 23),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: displayedLoans.length,
+                  itemBuilder: (context, index) {
+                    final documentId = displayedLoans[index].id;
+                    return LoanTrack(
+                      imageAsset: displayedLoans[index].userImage,
+                      userName: displayedLoans[index].userName,
+                      loanType: displayedLoans[index].loanType,
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => OtherDisplay(
+                              documentId: documentId!,
+                            ),
+                          ),
+                        );
+                      },
+                      date: displayedLoans[index].date,
+                      icon: displayedLoans[index].icon,
+                      status: displayedLoans[index].status,
+                    );
+                  },
+                );
         },
+      ),
+    );
+  }
+
+   Widget _buildLoadingIndicator() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 60.0,
+            height: 60.0,
+            child: CircularProgressIndicator(
+              backgroundColor: ScreenColor.textdivider,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Loading',
+            style: TextStyle(color: ScreenColor.textPrimary),
+          ),
+        ],
+      ),
+    );
+  }
+
+ Widget _buildSearchBar() {
+    return Container(
+      width: 200.0,
+      margin: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+         color: ScreenColor.subtext,
+        borderRadius: BorderRadius.circular(18.0),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    isSearching = value.isNotEmpty;
+                  });
+                },
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {},
+          ),
+        ],
       ),
     );
   }
