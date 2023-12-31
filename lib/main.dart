@@ -1,6 +1,4 @@
 import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
-import 'package:finkin_admin/login/views/login_view.dart';
-import 'package:finkin_admin/widgets/admin_info_track/admin_info.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +25,7 @@ class MyApp extends StatelessWidget {
       
       ),
       debugShowCheckedModeBanner: false,
-      home: const AdminInfo(),
+      home: const AdminView(documentId: '',),
     );
   }
 }

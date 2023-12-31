@@ -62,9 +62,22 @@ class _AllAgentsState extends State<AllAgents> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isSearching ? 'Search Results' : 'All Agents'),
-        actions: [
-          _buildSearchBar(),
-        ],
+      actions:  [
+        _buildSearchBar(),
+         const SizedBox(width: 20,),
+            const Text("User Name Here"),
+          const SizedBox(width: 20,),
+        
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 20.0,
+            backgroundColor: Colors.grey, ),
+        ),
+        
+      ],
+
+        
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Agents').snapshots(),

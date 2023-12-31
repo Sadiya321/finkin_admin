@@ -1,5 +1,6 @@
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/loan_info_display/info_display.dart';
+import 'package:finkin_admin/login/views/login_view.dart';
 import 'package:finkin_admin/widgets/all_agents_content/all_agents_content.dart';
 import 'package:finkin_admin/widgets/all_loans_content/all_loans_content.dart';
 import 'package:finkin_admin/widgets/all_users_content/all_users_content.dart';
@@ -11,7 +12,10 @@ import '../../widgets/loan_request_content/loan_request_content.dart';
 
 class AdminView extends StatefulWidget {
   final String documentId;
-  const AdminView({Key? key,required this.documentId,}) : super(key: key);
+  const AdminView({
+    Key? key,
+    required this.documentId,
+  }) : super(key: key);
 
   @override
   State<AdminView> createState() => _AdminViewState();
@@ -20,13 +24,45 @@ class AdminView extends StatefulWidget {
 class _AdminViewState extends State<AdminView> {
   List<double> monthlyData = [30, 50, 80, 40, 60, 90, 70, 100, 50, 80, 120, 90];
 
-  String selectedContent = 'Dashboard'; 
+  String selectedContent = 'Dashboard';
 
   void onDrawerItemClicked(String content) {
     setState(() {
       selectedContent = content;
     });
   }
+  void showLogoutConfirmationDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); 
+            },
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Perform logout logic here
+              // For example, navigate to the login screen
+              Navigator.of(context).pop(); // Close the dialog
+             Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              ); // Replace with your login screen route
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,9 +131,13 @@ class _AdminViewState extends State<AdminView> {
                       onDrawerItemClicked('All Agents');
                     }),
                     const SizedBox(
-                      height: 15,
-                    ),
-                    
+                        height: 15,
+                      ),
+
+                        buildDrawerItem(
+                          Icons.logout, 'Log Out', () {
+                        onDrawerItemClicked('Log Out');
+                      }),
                   ],
                 ),
               ),
@@ -167,7 +207,11 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         height: 15,
                       ),
-                      
+
+                        buildDrawerItem(
+                          Icons.logout, 'Log Out', () {
+                        onDrawerItemClicked('Log Out');
+                      }),
                     ],
                   ),
                 ),
@@ -196,98 +240,119 @@ class _AdminViewState extends State<AdminView> {
         return buildAllUsersContent();
       case 'All Agents':
         return buildAllAgentsContent();
-       
+        
+
+        
+        
+
       default:
         return buildDefaultContent();
     }
   }
 
   Widget buildDashboardContent() {
-    return Stack(
-      children: [
-        Column(
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [ScreenColor.primary, ScreenColor.textPrimary],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dashboard'),
+        automaticallyImplyLeading: false,
+        actions: const [
+          Text("User Name Here"),
+          SizedBox(width: 20,),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircleAvatar(
+              radius: 20.0,
+              backgroundColor: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [ScreenColor.primary, ScreenColor.textPrimary],
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.all(10.0),
-              child: SizedBox(
-                height: 300,
-                child: LineChart(
-                  LineChartData(
-                    gridData: FlGridData(
-                      show: true,
-                      drawHorizontalLine: true,
-                      drawVerticalLine: false,
-                    ),
-                    titlesData: FlTitlesData(
-                      leftTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        margin: 0,
-                        getTitles: (value) {
-                          switch (value.toInt()) {
-                            case 0:
-                              return '0';
-                            case 20:
-                              return '2023';
-                            case 40:
-                              return '2024';
-                            case 60:
-                              return '2025';
-                            case 80:
-                              return '2026';
-                            case 100:
-                              return '2027';
-                            default:
-                              return '';
-                          }
-                        },
+                padding: const EdgeInsets.all(10.0),
+                child: SizedBox(
+                  height: 300,
+                  child: LineChart(
+                    LineChartData(
+                      gridData: FlGridData(
+                        show: true,
+                        drawHorizontalLine: true,
+                        drawVerticalLine: false,
                       ),
-                    ),
-                    borderData: FlBorderData(
-                      show: false,
-                    ),
-                    minX: 0,
-                    maxX: monthlyData.length.toDouble(),
-                    minY: 0,
-                    maxY: 120,
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: List.generate(
-                          monthlyData.length,
-                          (index) => FlSpot(
-                            index.toDouble(),
-                            monthlyData[index],
-                          ),
+                      titlesData: FlTitlesData(
+                        leftTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          margin: 0,
+                          getTitles: (value) {
+                            switch (value.toInt()) {
+                              case 0:
+                                return '0';
+                              case 20:
+                                return '2023';
+                              case 40:
+                                return '2024';
+                              case 60:
+                                return '2025';
+                              case 80:
+                                return '2026';
+                              case 100:
+                                return '2027';
+                              default:
+                                return '';
+                            }
+                          },
                         ),
-                        isCurved: true,
-                        dotData: FlDotData(show: true),
-                        belowBarData: BarAreaData(show: true),
                       ),
-                    ],
+                      borderData: FlBorderData(
+                        show: false,
+                      ),
+                      minX: 0,
+                      maxX: monthlyData.length.toDouble(),
+                      minY: 0,
+                      maxY: 120,
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: List.generate(
+                            monthlyData.length,
+                            (index) => FlSpot(
+                              index.toDouble(),
+                              monthlyData[index],
+                            ),
+                          ),
+                          isCurved: true,
+                          dotData: FlDotData(show: true),
+                          belowBarData: BarAreaData(show: true),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-        ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 290.0, left: 16.0),
-              child: buildContainer(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0, right: 16.0),
-              child: buildTwoContainer(),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+          ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 290.0, left: 16.0),
+                child: buildContainer(),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0, right: 16.0),
+                child: buildTwoContainer(),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -310,6 +375,8 @@ class _AdminViewState extends State<AdminView> {
   Widget buildAllAgentsContent() {
     return const AllAgents();
   }
+//******************************************** */
+
 
   Widget buildDefaultContent() {
     return const Text('Select an item from the drawer to view content.');
@@ -419,11 +486,17 @@ class _AdminViewState extends State<AdminView> {
     );
   }
 
-  Widget buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: ScreenColor.textLight),
-      title: Text(title, style: const TextStyle(color: ScreenColor.textLight)),
-      onTap: onTap,
-    );
-  }
+Widget buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
+  return ListTile(
+    leading: Icon(icon, color: ScreenColor.textLight),
+    title: Text(title, style: const TextStyle(color: ScreenColor.textLight)),
+    onTap: () {
+      if (title == 'Log Out') {
+        showLogoutConfirmationDialog(context);
+      } else {
+        onTap();
+      }
+    },
+  );
+}
 }

@@ -1,7 +1,10 @@
+import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
+import 'package:finkin_admin/widgets/admin_info_track/admin_info.dart';
 import 'package:flutter/material.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/controller/login_controller/login_controller.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -182,6 +185,25 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
                 await _firebaseAuth.sendOTP(phoneNumberController.text);
             await _firebaseAuth.authenticateMe(
                 confirmationResult, otpController.text);
+                
+                 bool isFirstLoginValue = await isFirstLogin();
+
+  if (isFirstLoginValue) {
+        // If it's the first login, navigate to AdminInfo
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminInfo()),
+        );
+        await markLoginNotFirstTime();
+        } else {
+        // If not the first login, navigate to AdminView
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminView(documentId: '',)),
+        );
+      }
           } catch (e) {
             // Handle error
             print("Error authenticating: $e");
@@ -212,4 +234,16 @@ class WaveClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;
   }
+}
+
+Future<bool> isFirstLogin() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isFirstLogin = prefs.getBool('isFirstLogin') ?? true;
+  return isFirstLogin;
+}
+
+
+Future<void> markLoginNotFirstTime() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isFirstLogin', false);
 }
