@@ -123,6 +123,9 @@ class LoanModel {
       secondImg: data?["SecondImg"] ?? "",
     );
   }
+  String get combinedIncome {
+    return '$monthlyIncome$income';
+  }
 
   static LoanStatus _getStatusFromString(String? status) {
     switch (status?.toLowerCase()) {
@@ -133,7 +136,7 @@ class LoanModel {
       case 'denied':
         return LoanStatus.denied;
       default:
-        return LoanStatus.pending; 
+        return LoanStatus.pending;
     }
   }
 
