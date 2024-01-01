@@ -49,11 +49,13 @@ dependencies:
   firebase_auth: ^4.15.3
   cloud_firestore: ^4.13.6
   horizontal_stepper_flutter: ^1.0.3
-  pdf: ^3.10.7
-  path_provider: ^2.1.1
-  open_file: ^3.3.2
+  flutter_svg: ^2.0.9
+  image_picker: ^1.0.5
+  shared_preferences: ^2.2.2
   universal_html: ^2.2.4
-  cached_network_image: ^3.3.1
+  open_file: ^3.3.2
+  pdf: ^3.10.7
+  firebase_storage: ^11.5.6
   # intl_phone_number_input: ^4.0.6
 
 dev_dependencies:

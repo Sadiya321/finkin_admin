@@ -29,8 +29,18 @@ class _AllUsersState extends State<AllUsers> {
       appBar: AppBar(
         title: Text(isSearching ? 'Search Results' : 'All Users'),
         actions: [
-          _buildSearchButton(),
-        ],
+            _buildSearchBar(),
+             const SizedBox(width: 20,),
+            const Text("User Name Here"),
+          const SizedBox(width: 20,),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 20.0,
+            backgroundColor: Colors.grey, ),
+        ),
+      ],
+        
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Loan').snapshots(),
@@ -59,39 +69,36 @@ class _AllUsersState extends State<AllUsers> {
     );
   }
 
-  Widget _buildSearchButton() {
+  Widget _buildSearchBar() {
     return Container(
-      width: 250.0,
+      width: 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: ScreenColor.subtext,
-        borderRadius: BorderRadius.circular(8.0),
+         color: ScreenColor.subtext,
+        borderRadius: BorderRadius.circular(18.0),
       ),
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              controller: searchController,
-              decoration: const InputDecoration(
-                hintText: 'Search...',
-                hintStyle: TextStyle(color: ScreenColor.textLight),
-                border: InputBorder.none,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    isSearching = value.isNotEmpty;
+                  });
+                },
               ),
-              style: const TextStyle(color: ScreenColor.textLight),
-              onChanged: (value) {
-                setState(() {
-                  isSearching = value.isNotEmpty;
-                });
-              },
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.search, color: ScreenColor.textLight),
-            onPressed: () {
-              setState(() {
-                isSearching = true;
-              });
-            },
+            icon: const Icon(Icons.search),
+            onPressed: () {},
           ),
         ],
       ),
@@ -134,6 +141,14 @@ class _AllUsersState extends State<AllUsers> {
   }
 
   Widget _buildAgentGridView() {
+      if (isSearching && displayedUsers.isEmpty) {
+    return const Center(
+      child: Text(
+        'Search results not found',
+        style: TextStyle(fontSize: 23),
+      ),
+    );
+  }
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
@@ -240,6 +255,7 @@ class UserSearchDelegate extends SearchDelegate<String> {
         .where(
             (user) => user.username.toLowerCase().contains(query.toLowerCase()))
         .toList();
+        
 
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
