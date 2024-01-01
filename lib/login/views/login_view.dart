@@ -185,25 +185,25 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
                 await _firebaseAuth.sendOTP(phoneNumberController.text);
             await _firebaseAuth.authenticateMe(
                 confirmationResult, otpController.text);
-                
-                 bool isFirstLoginValue = await isFirstLogin();
+  //               bool isFirstLoginValue = await isFirstLogin();
 
-  if (isFirstLoginValue) {
-        // If it's the first login, navigate to AdminInfo
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminInfo()),
-        );
-        await markLoginNotFirstTime();
-        } else {
-        // If not the first login, navigate to AdminView
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminView(documentId: '',)),
-        );
-      }
+  // if (isFirstLoginValue) {
+  //       // If it's the first login, navigate to AdminInfo
+  //       // ignore: use_build_context_synchronously
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const AdminInfo()),
+  //       );
+  //       await markLoginNotFirstTime();
+  //       } else {
+  //       // If not the first login, navigate to AdminView
+  //       // ignore: use_build_context_synchronously
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const AdminView(documentId: '',)),
+  //       );
+  //     }
+                 
           } catch (e) {
             // Handle error
             print("Error authenticating: $e");

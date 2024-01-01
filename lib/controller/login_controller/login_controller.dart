@@ -1,4 +1,5 @@
 import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
+import 'package:finkin_admin/widgets/admin_info_track/admin_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,7 @@ class FirebaseAuthentication {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AdminView(documentId: '',),
+            builder: (context) => AdminInfo(),
           ),
         );
       } else {
