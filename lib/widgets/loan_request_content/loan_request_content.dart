@@ -4,7 +4,9 @@ import 'package:finkin_admin/loan_model/loan_model.dart';
 import 'package:finkin_admin/res/constants/enums/enums.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../controller/admin_data_controller/adminData_controller.dart';
 import '../../loan_info_display/info_display.dart';
 
 class LoanRequest extends StatefulWidget {
@@ -15,10 +17,21 @@ class LoanRequest extends StatefulWidget {
 }
 
 class _LoanRequestState extends State<LoanRequest> {
+  final AdminDataController adminDataController =
+      Get.put(AdminDataController());
   late List<LoanModel> allLoans;
   late List<LoanModel> displayedLoans;
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
+  int get loanRequestsCount {
+    return allLoans.where((loan) => loan.status == LoanStatus.pending).length;
+  }
+
+  int getDisplayedLoansCount() {
+    // Replace this logic with your actual logic to count displayed loans
+    return displayedLoans
+        .length; // Assuming displayedLoans contains the requested loans
+  }
 
   @override
   void initState() {
@@ -34,17 +47,41 @@ class _LoanRequestState extends State<LoanRequest> {
         title: Text(isSearching ? 'Search Results' : 'Loan Requests'),
         actions: [
           _buildSearchBar(),
-           const SizedBox(width: 20,),
-            const Text("User Name Here"),
-          const SizedBox(width: 20,),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Colors.grey, ),
-        ),
-      ],
-        
+          const SizedBox(
+            width: 20,
+          ),
+          FutureBuilder<List<String?>>(
+            future: adminDataController
+                .getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+            builder: (context, snapshot) {
+              String agentName = snapshot.data?[0] ?? "";
+              String? agentImage = snapshot.data?[1];
+
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(agentName),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      radius: 20.0,
+                      backgroundColor: Colors.grey,
+                      backgroundImage: agentImage != null
+                          ? NetworkImage(agentImage) as ImageProvider<Object>?
+                          : AssetImage('path_to_default_image')
+                              as ImageProvider<Object>?,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('Loan').snapshots(),

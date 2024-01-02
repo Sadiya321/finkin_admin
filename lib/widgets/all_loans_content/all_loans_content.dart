@@ -3,7 +3,9 @@ import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/loan_model/loan_model.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../controller/admin_data_controller/adminData_controller.dart';
 import '../../loan_info_display/other_display.dart';
 
 class AllLoans extends StatefulWidget {
@@ -14,9 +16,11 @@ class AllLoans extends StatefulWidget {
 }
 
 class _AllLoansState extends State<AllLoans> {
+  final AdminDataController adminDataController =
+      Get.put(AdminDataController());
   late List<LoanModel> allLoans;
   late List<LoanModel> displayedLoans;
-   bool isSearching = false;
+  bool isSearching = false;
   TextEditingController searchController = TextEditingController();
 
   @override
@@ -33,18 +37,41 @@ class _AllLoansState extends State<AllLoans> {
         title: Text(isSearching ? 'Search Results' : 'All Loans'),
         actions: [
           _buildSearchBar(),
-           const SizedBox(width: 20,),
-            const Text("User Name Here"),
-          const SizedBox(width: 20,),
-          
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Colors.grey, ),
-        ),
-      ],
-        
+          const SizedBox(
+            width: 20,
+          ),
+          FutureBuilder<List<String?>>(
+            future: adminDataController
+                .getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+            builder: (context, snapshot) {
+              String agentName = snapshot.data?[0] ?? "";
+              String? agentImage = snapshot.data?[1];
+
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(agentName),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      radius: 20.0,
+                      backgroundColor: Colors.grey,
+                      backgroundImage: agentImage != null
+                          ? NetworkImage(agentImage) as ImageProvider<Object>?
+                          : AssetImage('path_to_default_image')
+                              as ImageProvider<Object>?,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('Loan').snapshots(),
@@ -113,7 +140,7 @@ class _AllLoansState extends State<AllLoans> {
     );
   }
 
-   Widget _buildLoadingIndicator() {
+  Widget _buildLoadingIndicator() {
     return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -135,12 +162,12 @@ class _AllLoansState extends State<AllLoans> {
     );
   }
 
- Widget _buildSearchBar() {
+  Widget _buildSearchBar() {
     return Container(
       width: 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-         color: ScreenColor.subtext,
+        color: ScreenColor.subtext,
         borderRadius: BorderRadius.circular(18.0),
       ),
       child: Row(

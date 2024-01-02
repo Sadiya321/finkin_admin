@@ -1,5 +1,4 @@
 import 'package:finkin_admin/common/utils/screen_color.dart';
-import 'package:finkin_admin/loan_info_display/info_display.dart';
 import 'package:finkin_admin/login/views/login_view.dart';
 import 'package:finkin_admin/widgets/all_agents_content/all_agents_content.dart';
 import 'package:finkin_admin/widgets/all_loans_content/all_loans_content.dart';
@@ -7,7 +6,9 @@ import 'package:finkin_admin/widgets/all_users_content/all_users_content.dart';
 import 'package:finkin_admin/widgets/approved_loans_content/approved_loans_content.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../controller/admin_data_controller/adminData_controller.dart';
 import '../../widgets/loan_request_content/loan_request_content.dart';
 
 class AdminView extends StatefulWidget {
@@ -23,46 +24,47 @@ class AdminView extends StatefulWidget {
 
 class _AdminViewState extends State<AdminView> {
   List<double> monthlyData = [30, 50, 80, 40, 60, 90, 70, 100, 50, 80, 120, 90];
-
+  final AdminDataController adminDataController =
+      Get.put(AdminDataController());
   String selectedContent = 'Dashboard';
-
+  // final GlobalKey<LoanRequestState> loanRequestKey = GlobalKey();
   void onDrawerItemClicked(String content) {
     setState(() {
       selectedContent = content;
     });
   }
-  void showLogoutConfirmationDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); 
-            },
-            child: const Text('No'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Perform logout logic here
-              // For example, navigate to the login screen
-              Navigator.of(context).pop(); // Close the dialog
-             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              ); // Replace with your login screen route
-            },
-            child: const Text('Yes'),
-          ),
-        ],
-      );
-    },
-  );
-}
 
+  void showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Log Out'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform logout logic here
+                // For example, navigate to the login screen
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                ); // Replace with your login screen route
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,13 +133,11 @@ class _AdminViewState extends State<AdminView> {
                       onDrawerItemClicked('All Agents');
                     }),
                     const SizedBox(
-                        height: 15,
-                      ),
-
-                        buildDrawerItem(
-                          Icons.logout, 'Log Out', () {
-                        onDrawerItemClicked('Log Out');
-                      }),
+                      height: 15,
+                    ),
+                    buildDrawerItem(Icons.logout, 'Log Out', () {
+                      onDrawerItemClicked('Log Out');
+                    }),
                   ],
                 ),
               ),
@@ -207,9 +207,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         height: 15,
                       ),
-
-                        buildDrawerItem(
-                          Icons.logout, 'Log Out', () {
+                      buildDrawerItem(Icons.logout, 'Log Out', () {
                         onDrawerItemClicked('Log Out');
                       }),
                     ],
@@ -240,10 +238,6 @@ class _AdminViewState extends State<AdminView> {
         return buildAllUsersContent();
       case 'All Agents':
         return buildAllAgentsContent();
-        
-
-        
-        
 
       default:
         return buildDefaultContent();
@@ -251,108 +245,183 @@ class _AdminViewState extends State<AdminView> {
   }
 
   Widget buildDashboardContent() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        automaticallyImplyLeading: false,
-        actions: const [
-          Text("User Name Here"),
-          SizedBox(width: 20,),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              radius: 20.0,
-              backgroundColor: Colors.grey,
+    return FutureBuilder<List<String?>>(
+      future: adminDataController.getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Dashboard'),
+              automaticallyImplyLeading: false,
+              actions: const [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    radius: 20.0,
+                    backgroundColor: Colors.grey,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [ScreenColor.primary, ScreenColor.textPrimary],
+            body: Container(),
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Dashboard'),
+              automaticallyImplyLeading: false,
+              actions: [
+                Text('Error: ${snapshot.error}'),
+                const SizedBox(width: 20),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    radius: 20.0,
+                    backgroundColor: Colors.grey,
                   ),
                 ),
-                padding: const EdgeInsets.all(10.0),
-                child: SizedBox(
-                  height: 300,
-                  child: LineChart(
-                    LineChartData(
-                      gridData: FlGridData(
-                        show: true,
-                        drawHorizontalLine: true,
-                        drawVerticalLine: false,
-                      ),
-                      titlesData: FlTitlesData(
-                        leftTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40,
-                          margin: 0,
-                          getTitles: (value) {
-                            switch (value.toInt()) {
-                              case 0:
-                                return '0';
-                              case 20:
-                                return '2023';
-                              case 40:
-                                return '2024';
-                              case 60:
-                                return '2025';
-                              case 80:
-                                return '2026';
-                              case 100:
-                                return '2027';
-                              default:
-                                return '';
-                            }
-                          },
+              ],
+            ),
+            body: Container(),
+          );
+        } else if (!snapshot.hasData || snapshot.data == null) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Dashboard'),
+              automaticallyImplyLeading: false,
+              actions: const [
+                Text('No data available'),
+                SizedBox(width: 20),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    radius: 20.0,
+                    backgroundColor: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+            body: Container(),
+          );
+        } else {
+          String agentName = snapshot.data?[0] ?? "Defaulte Name";
+          String? agentImage = snapshot.data?[1];
+
+          // int loanRequestsCount =
+          //     loanRequestKey.currentState?.allLoans.length ?? 0;
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Dashboard'),
+              automaticallyImplyLeading: false,
+              actions: [
+                Text(agentName),
+                SizedBox(width: 20),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    radius: 20.0,
+                    backgroundColor: Colors.grey,
+                    backgroundImage: agentImage != null
+                        ? NetworkImage(agentImage)
+                        : const AssetImage('assets/images/hill.png')
+                            as ImageProvider<Object>?,
+                  ),
+                ),
+              ],
+            ),
+            body: Stack(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            ScreenColor.primary,
+                            ScreenColor.textPrimary
+                          ],
                         ),
                       ),
-                      borderData: FlBorderData(
-                        show: false,
-                      ),
-                      minX: 0,
-                      maxX: monthlyData.length.toDouble(),
-                      minY: 0,
-                      maxY: 120,
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: List.generate(
-                            monthlyData.length,
-                            (index) => FlSpot(
-                              index.toDouble(),
-                              monthlyData[index],
+                      padding: const EdgeInsets.all(10.0),
+                      child: SizedBox(
+                        height: 300,
+                        child: LineChart(
+                          LineChartData(
+                            gridData: FlGridData(
+                              show: true,
+                              drawHorizontalLine: true,
+                              drawVerticalLine: false,
                             ),
+                            titlesData: FlTitlesData(
+                              leftTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 40,
+                                margin: 0,
+                                getTitles: (value) {
+                                  switch (value.toInt()) {
+                                    case 0:
+                                      return '0';
+                                    case 20:
+                                      return '2023';
+                                    case 40:
+                                      return '2024';
+                                    case 60:
+                                      return '2025';
+                                    case 80:
+                                      return '2026';
+                                    case 100:
+                                      return '2027';
+                                    default:
+                                      return '';
+                                  }
+                                },
+                              ),
+                            ),
+                            borderData: FlBorderData(
+                              show: false,
+                            ),
+                            minX: 0,
+                            maxX: monthlyData.length.toDouble(),
+                            minY: 0,
+                            maxY: 120,
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: List.generate(
+                                  monthlyData.length,
+                                  (index) => FlSpot(
+                                    index.toDouble(),
+                                    monthlyData[index],
+                                  ),
+                                ),
+                                isCurved: true,
+                                dotData: FlDotData(show: true),
+                                belowBarData: BarAreaData(show: true),
+                              ),
+                            ],
                           ),
-                          isCurved: true,
-                          dotData: FlDotData(show: true),
-                          belowBarData: BarAreaData(show: true),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 290.0, left: 16.0),
-                child: buildContainer(),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, right: 16.0),
-                child: buildTwoContainer(),
-              ),
-            ],
-          ),
-        ],
-      ),
+                ListView(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 290.0, left: 16.0),
+                    child: buildContainer(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, right: 16.0),
+                    child: buildTwoContainer(),
+                  ),
+                ]),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -377,7 +446,6 @@ class _AdminViewState extends State<AdminView> {
   }
 //******************************************** */
 
-
   Widget buildDefaultContent() {
     return const Text('Select an item from the drawer to view content.');
   }
@@ -386,57 +454,85 @@ class _AdminViewState extends State<AdminView> {
     return Row(
       children: [
         Expanded(
-          child: Container(
-            height: 200,
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: ScreenColor.textLight,
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
-                  color: ScreenColor.textdivider.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
+          child: Column(
+            children: [
+              Container(
+                height: 200,
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: ScreenColor.textLight,
+                  borderRadius: BorderRadius.circular(5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ScreenColor.textdivider.withOpacity(0.2),
+                      spreadRadius: 5,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+                child:
+                    Image.network('assets/images/pro.png', fit: BoxFit.cover),
+              ),
+              const SizedBox(height: 8.0),
+              Text('Loan Requests()',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
           ),
         ),
         Expanded(
-          child: Container(
-            height: 200,
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: ScreenColor.textLight,
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
-                  color: ScreenColor.textdivider.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
+          child: Column(
+            children: [
+              Container(
+                height: 200,
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: ScreenColor.textLight,
+                  borderRadius: BorderRadius.circular(5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ScreenColor.textdivider.withOpacity(0.2),
+                      spreadRadius: 5,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+                child:
+                    Image.network('assets/images/pro.png', fit: BoxFit.cover),
+              ),
+              const SizedBox(height: 8.0),
+              const Text('Approved Loans()',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
           ),
         ),
         Expanded(
-          child: Container(
-            height: 200,
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: ScreenColor.textLight,
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
-                  color: ScreenColor.textdivider.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
+          child: Column(
+            children: [
+              Container(
+                height: 200,
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: ScreenColor.textLight,
+                  borderRadius: BorderRadius.circular(5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ScreenColor.textdivider.withOpacity(0.2),
+                      spreadRadius: 5,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+                child:
+                    Image.network('assets/images/pro.png', fit: BoxFit.cover),
+              ),
+              const SizedBox(height: 8.0),
+              const Text('All Loans()',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
           ),
         ),
       ],
@@ -486,17 +582,17 @@ class _AdminViewState extends State<AdminView> {
     );
   }
 
-Widget buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
-  return ListTile(
-    leading: Icon(icon, color: ScreenColor.textLight),
-    title: Text(title, style: const TextStyle(color: ScreenColor.textLight)),
-    onTap: () {
-      if (title == 'Log Out') {
-        showLogoutConfirmationDialog(context);
-      } else {
-        onTap();
-      }
-    },
-  );
-}
+  Widget buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: ScreenColor.textLight),
+      title: Text(title, style: const TextStyle(color: ScreenColor.textLight)),
+      onTap: () {
+        if (title == 'Log Out') {
+          showLogoutConfirmationDialog(context);
+        } else {
+          onTap();
+        }
+      },
+    );
+  }
 }

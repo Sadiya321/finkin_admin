@@ -1,16 +1,19 @@
+import 'dart:html' as html;
+import 'dart:typed_data' show Uint8List;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/loan_model/loan_model.dart';
 import 'package:finkin_admin/res/constants/enums/enums.dart';
 import 'package:finkin_admin/widgets/approved_loans_content/otherDisplayContent.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_approve_track.dart';
-import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'dart:html' as html;
-import 'dart:typed_data' show Uint8List;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
+
+import '../../controller/admin_data_controller/adminData_controller.dart';
 import '../../loan_info_display/other_display.dart';
 
 class ApprovedLoans extends StatefulWidget {
@@ -21,11 +24,13 @@ class ApprovedLoans extends StatefulWidget {
 }
 
 class _ApprovedLoansState extends State<ApprovedLoans> {
+  final AdminDataController adminDataController =
+      Get.put(AdminDataController());
   late List<LoanModel> allLoans;
   late List<LoanModel> displayedLoans;
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
-   Future<void> _generateAndSavePDF(
+  Future<void> _generateAndSavePDF(
     String documentId,
     String userName,
     String loanType,
@@ -90,7 +95,6 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
     html.Url.revokeObjectUrl(url);
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -105,16 +109,40 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
         title: Text(isSearching ? 'Search Results' : 'Approved Loans'),
         actions: [
           _buildSearchBar(),
-           const SizedBox(width: 20,),
-            const Text("User Name Here"),
-          const SizedBox(width: 20,),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Colors.grey, ),
-        ),
-      
+          const SizedBox(
+            width: 20,
+          ),
+          FutureBuilder<List<String?>>(
+            future: adminDataController
+                .getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+            builder: (context, snapshot) {
+              String agentName = snapshot.data?[0] ?? "";
+              String? agentImage = snapshot.data?[1];
+
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(agentName),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      radius: 20.0,
+                      backgroundColor: Colors.grey,
+                      backgroundImage: agentImage != null
+                          ? NetworkImage(agentImage) as ImageProvider<Object>?
+                          : AssetImage('path_to_default_image')
+                              as ImageProvider<Object>?,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -125,7 +153,7 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-              return _buildLoadingIndicator();
+            return _buildLoadingIndicator();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Text(' Approved Loans Not Found.'),
@@ -151,45 +179,48 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
               .toList();
 
           return displayedLoans.isEmpty
-              ? const Center(child: Text('search results Not Found.',style: TextStyle(fontSize: 26),))
+              ? const Center(
+                  child: Text(
+                  'search results Not Found.',
+                  style: TextStyle(fontSize: 26),
+                ))
               : ListView.builder(
                   itemCount: displayedLoans.length,
                   itemBuilder: (context, index) {
                     final documentId = displayedLoans[index].id;
                     return LoanAppTrack(
-                     imageAsset: displayedLoans[index].userImage,
-                userName: displayedLoans[index].userName,
-                loanType: displayedLoans[index].loanType,
-                pin: displayedLoans[index].pin,
-                email: displayedLoans[index].email,
-                panNo: displayedLoans[index].panNo,
-                phone: displayedLoans[index].phone,
-                aadharNo: displayedLoans[index].aadharNo,
-                nationality: displayedLoans[index].nationality,
-                address: displayedLoans[index].address,
-                empType: displayedLoans[index].empType,
-                income: displayedLoans[index].combinedIncome,
-                dob: displayedLoans[index].date,
-                downloadIcon: Icons.download,
-                onDownloadPressed: () {
-                  _generateAndSavePDF(
-                    documentId!,
-                    displayedLoans[index].userName,
-                    displayedLoans[index].loanType,
-                    displayedLoans[index].panNo,
-                    displayedLoans[index].pin,
-                    displayedLoans[index].email,
-                    displayedLoans[index].phone,
-                    displayedLoans[index].aadharNo,
-                    displayedLoans[index].nationality,
-                    displayedLoans[index].address,
-                    displayedLoans[index].empType,
-                    displayedLoans[index].combinedIncome,
-                    displayedLoans[index].date,
-                    // displayedLoans[index].panImg,
-                  );
-                },
-                
+                      imageAsset: displayedLoans[index].userImage,
+                      userName: displayedLoans[index].userName,
+                      loanType: displayedLoans[index].loanType,
+                      pin: displayedLoans[index].pin,
+                      email: displayedLoans[index].email,
+                      panNo: displayedLoans[index].panNo,
+                      phone: displayedLoans[index].phone,
+                      aadharNo: displayedLoans[index].aadharNo,
+                      nationality: displayedLoans[index].nationality,
+                      address: displayedLoans[index].address,
+                      empType: displayedLoans[index].empType,
+                      income: displayedLoans[index].combinedIncome,
+                      dob: displayedLoans[index].date,
+                      downloadIcon: Icons.download,
+                      onDownloadPressed: () {
+                        _generateAndSavePDF(
+                          documentId!,
+                          displayedLoans[index].userName,
+                          displayedLoans[index].loanType,
+                          displayedLoans[index].panNo,
+                          displayedLoans[index].pin,
+                          displayedLoans[index].email,
+                          displayedLoans[index].phone,
+                          displayedLoans[index].aadharNo,
+                          displayedLoans[index].nationality,
+                          displayedLoans[index].address,
+                          displayedLoans[index].empType,
+                          displayedLoans[index].combinedIncome,
+                          displayedLoans[index].date,
+                          // displayedLoans[index].panImg,
+                        );
+                      },
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -210,7 +241,7 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
     );
   }
 
-   Widget _buildLoadingIndicator() {
+  Widget _buildLoadingIndicator() {
     return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -237,7 +268,7 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
       width: 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-         color: ScreenColor.subtext,
+        color: ScreenColor.subtext,
         borderRadius: BorderRadius.circular(18.0),
       ),
       child: Row(

@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/widgets/agents_track/agent_track.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../controller/admin_data_controller/adminData_controller.dart';
 
 class AllAgents extends StatefulWidget {
   const AllAgents({Key? key}) : super(key: key);
@@ -11,6 +14,8 @@ class AllAgents extends StatefulWidget {
 }
 
 class _AllAgentsState extends State<AllAgents> {
+  final AdminDataController adminDataController =
+      Get.put(AdminDataController());
   late List<Agent> allAgents;
   late List<Agent> displayedAgents;
   bool isSearching = false;
@@ -37,7 +42,8 @@ class _AllAgentsState extends State<AllAgents> {
               data['Name'], data['ImageUrl'], data['Email'], data['Phone']);
         }).toList();
 
-        displayedAgents = allAgents; // Set displayedAgents to allAgents initially
+        displayedAgents =
+            allAgents; // Set displayedAgents to allAgents initially
         agentsLoaded = true;
       });
     }
@@ -62,22 +68,43 @@ class _AllAgentsState extends State<AllAgents> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isSearching ? 'Search Results' : 'All Agents'),
-      actions:  [
-        _buildSearchBar(),
-         const SizedBox(width: 20,),
-            const Text("User Name Here"),
-          const SizedBox(width: 20,),
-        
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Colors.grey, ),
-        ),
-        
-      ],
+        actions: [
+          _buildSearchBar(),
+          const SizedBox(
+            width: 20,
+          ),
+          FutureBuilder<List<String?>>(
+            future: adminDataController
+                .getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+            builder: (context, snapshot) {
+              String agentName = snapshot.data?[0] ?? "";
+              String? agentImage = snapshot.data?[1];
 
-        
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(agentName),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      radius: 20.0,
+                      backgroundColor: Colors.grey,
+                      backgroundImage: agentImage != null
+                          ? NetworkImage(agentImage) as ImageProvider<Object>?
+                          : AssetImage('path_to_default_image')
+                              as ImageProvider<Object>?,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Agents').snapshots(),

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
@@ -9,7 +10,7 @@ import 'package:finkin_admin/repository/admin_repository.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 
 class AdminInfo extends StatefulWidget {
   const AdminInfo({Key? key}) : super(key: key);
@@ -19,25 +20,16 @@ class AdminInfo extends StatefulWidget {
 }
 
 class _AdminInfoState extends State<AdminInfo> {
-  File? _selectedImage;
+  File? _image;
+  Uint8List? _imageBytes;
   bool isImageUploaded = false;
+  bool isButtonPressed = false;
   final formKey = GlobalKey<FormState>();
-  String imageValidationError = '';
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final AdminController controller = Get.put(AdminController());
   final AdminController adminController = Get.find();
   final adminrepo = Get.put(AdminRepository());
-  File? _image;
-  Uint8List? _imageBytes; // Variable to store the selected image
-  bool isButtonPressed = false;
-
-  bool isFormValid() {
-    // Check if form details are filled and image is fetched
-    return formKey.currentState?.validate() ?? false && isImageUploaded;
-  }
-
-  final _db = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +102,7 @@ class _AdminInfoState extends State<AdminInfo> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      prefixIcon: Icon(Icons.person),
+                      prefixIcon: const Icon(Icons.person),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -121,64 +113,65 @@ class _AdminInfoState extends State<AdminInfo> {
                   ),
                 ),
                 const SizedBox(height: 16),
-               ElevatedButton(
-  onPressed: () async {
-    if (!isButtonPressed) {
-      isButtonPressed = true;
-      setState(() {});
+                ElevatedButton(
+                  onPressed: () async {
+                    if (!isButtonPressed) {
+                      isButtonPressed = true;
+                      setState(() {});
 
-      // Call uploadImageToFirebase to handle image upload
-      bool isImageUploadSuccessful = await uploadImageToFirebase();
+                      bool isImageUploadSuccessful =
+                          await uploadImageToFirebase();
 
-      // if (isImageUploadSuccessful) {
-        const snackBar = SnackBar(
-          content: Text(
-            'Submitting Form',
-            style: TextStyle(color: ScreenColor.textLight),
-          ),
-          backgroundColor: ScreenColor.primary,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      if (isImageUploadSuccessful) {
+                        const snackBar = SnackBar(
+                          content: Text(
+                            'Submitting Form',
+                            style: TextStyle(color: ScreenColor.textLight),
+                          ),
+                          backgroundColor: ScreenColor.primary,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-        // Create Firestore collection named "Admin"
-        final admin = AdminModel(
-          adminId: controller.firstNameController.text.trim(),
-          adminName: controller.firstNameController.text.trim(),
-          adminImage: adminController.imageUrl.value,
-        );
+                        final admin = AdminModel(
+                          adminId: controller.firstNameController.text.trim(),
+                          adminName: controller.firstNameController.text.trim(),
+                          adminImage: adminController.imageUrl.value,
+                        );
 
-        await _db.collection("Admin").add(admin.toJson());
-Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => AdminView(documentId: '',)),
-  );
-        // Navigate to the desired screen after Firestore operation
-        // Replace AdminView with your desired screen
-      // } else {
-      //   // Show an error message if image upload fails
-      //   SnackBar snackBar = const SnackBar(
-      //     content: Text(
-      //       'Error uploading image. Please try again.',
-      //       style: TextStyle(color: ScreenColor.textLight),
-      //     ),
-      //     backgroundColor: Colors.red,
-      //   );
-      //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      // }
-    }
-  },
-  style: ElevatedButton.styleFrom(
-    primary: Colors.deepPurple,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10.0),
-    ),
-  ),
-  child: const Text(
-    'Save',
-    style: TextStyle(color: Colors.white),
-  ),
-)
+                        await FirebaseFirestore.instance
+                            .collection("Admin")
+                            .add(admin.toJson());
 
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdminView(
+                                    documentId: '',
+                                  )),
+                        );
+                      } else {
+                        const snackBar = SnackBar(
+                          content: Text(
+                            'Error uploading image. Please try again.',
+                            style: TextStyle(color: ScreenColor.textLight),
+                          ),
+                          backgroundColor: Colors.red,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.deepPurple,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ],
             ),
           ),
@@ -188,58 +181,59 @@ Navigator.push(
   }
 
   Future<bool> uploadImageToFirebase() async {
-    if (_image != null) {
+    if (_imageBytes != null) {
       try {
         final firebase_storage.Reference storageRef = firebase_storage
             .FirebaseStorage.instance
             .ref()
-            .child('Admin_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+            .child('Admin/${DateTime.now().millisecondsSinceEpoch}.jpg');
 
+        // Use putData() instead of putFile() for web
         final firebase_storage.UploadTask uploadTask =
-            storageRef.putFile(_image!);
+            storageRef.putData(_imageBytes!);
 
         final firebase_storage.TaskSnapshot downloadSnapshot =
-            await uploadTask.whenComplete(() => null);
+            await uploadTask; // Await the completion of the task
 
-        final String imageUrl = await downloadSnapshot.ref.getDownloadURL();
-
-        setState(() {
-          adminController.imageUrl.value = imageUrl;
-          isImageUploaded = true;
-          imageValidationError = '';
-        });
-        return true;
+        if (downloadSnapshot.state == firebase_storage.TaskState.success) {
+          final String imageUrl = await downloadSnapshot.ref.getDownloadURL();
+          setState(() {
+            adminController.imageUrl.value = imageUrl;
+            isImageUploaded = true;
+          });
+          return true;
+        } else {
+          setState(() {
+            isImageUploaded = false;
+          });
+          return false;
+        }
       } catch (e) {
         print('Error uploading image: $e');
         setState(() {
-          imageValidationError = 'Error uploading image. Please try again.';
+          isImageUploaded = false;
         });
         return false;
       }
     } else {
       setState(() {
-        imageValidationError = 'Please select an image.';
+        isImageUploaded = false;
       });
-      return false; // Return false if no image is selected
+      return false;
     }
   }
 
   Future<void> _pickImage() async {
     try {
-      final pickedFile =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
+      final pickedFile = await ImagePickerWeb.getImageAsBytes();
 
       if (pickedFile != null) {
-        final imageBytes = await pickedFile.readAsBytes();
-
         setState(() {
-          _image = File(pickedFile.path); // Update _image with the picked file
-          _imageBytes = Uint8List.fromList(imageBytes);
+          _imageBytes = pickedFile; // Store the image bytes directly
         });
       }
     } catch (e) {
       print('Error picking image: $e');
-      // Optionally, show a snackbar or dialog to inform the user about the error.
     }
   }
 }

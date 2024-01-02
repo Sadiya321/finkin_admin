@@ -3,7 +3,6 @@ import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/loan_model/admin_model.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 class AdminRepository extends GetxController {
   static AdminRepository get instance => Get.find();
@@ -20,12 +19,35 @@ class AdminRepository extends GetxController {
           colorText: ScreenColor.icon);
 
       // Navigate to the desired screen after success
-      Get.to(AdminView(documentId: '',)); // Replace NextScreen with your desired screen
+      Get.to(AdminView(
+        documentId: '',
+      )); // Replace NextScreen with your desired screen
     } catch (error, stackTrace) {
       Get.snackbar("Error", "Something went wrong. Try again",
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: ScreenColor.icon.withOpacity(0.1),
           colorText: ScreenColor.icon);
+    }
+  }
+
+  Future<AdminModel?> getAdminById(String adminId) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+          .collection('Admin')
+          .where('AdminId', isEqualTo: adminId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot<Map<String, dynamic>> document =
+            querySnapshot.docs.first;
+        return AdminModel.fromSnapshot(document);
+      } else {
+        print("Document does not exist.");
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching agent data: $e');
+      return null;
     }
   }
 }

@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/widgets/user_track/user_track.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../controller/admin_data_controller/adminData_controller.dart';
 
 class AllUsers extends StatefulWidget {
   const AllUsers({Key? key}) : super(key: key);
@@ -11,6 +14,8 @@ class AllUsers extends StatefulWidget {
 }
 
 class _AllUsersState extends State<AllUsers> {
+  final AdminDataController adminDataController =
+      Get.put(AdminDataController());
   late List<User> allUsers;
   late List<User> displayedUsers;
   bool isSearching = false;
@@ -29,18 +34,42 @@ class _AllUsersState extends State<AllUsers> {
       appBar: AppBar(
         title: Text(isSearching ? 'Search Results' : 'All Users'),
         actions: [
-            _buildSearchBar(),
-             const SizedBox(width: 20,),
-            const Text("User Name Here"),
-          const SizedBox(width: 20,),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Colors.grey, ),
-        ),
-      ],
-        
+          _buildSearchBar(),
+          const SizedBox(
+            width: 20,
+          ),
+          FutureBuilder<List<String?>>(
+            future: adminDataController
+                .getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+            builder: (context, snapshot) {
+              String agentName = snapshot.data?[0] ?? "";
+              String? agentImage = snapshot.data?[1];
+
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(agentName),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      radius: 20.0,
+                      backgroundColor: Colors.grey,
+                      backgroundImage: agentImage != null
+                          ? NetworkImage(agentImage) as ImageProvider<Object>?
+                          : AssetImage('path_to_default_image')
+                              as ImageProvider<Object>?,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Loan').snapshots(),
@@ -74,7 +103,7 @@ class _AllUsersState extends State<AllUsers> {
       width: 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-         color: ScreenColor.subtext,
+        color: ScreenColor.subtext,
         borderRadius: BorderRadius.circular(18.0),
       ),
       child: Row(
@@ -141,14 +170,14 @@ class _AllUsersState extends State<AllUsers> {
   }
 
   Widget _buildAgentGridView() {
-      if (isSearching && displayedUsers.isEmpty) {
-    return const Center(
-      child: Text(
-        'Search results not found',
-        style: TextStyle(fontSize: 23),
-      ),
-    );
-  }
+    if (isSearching && displayedUsers.isEmpty) {
+      return const Center(
+        child: Text(
+          'Search results not found',
+          style: TextStyle(fontSize: 23),
+        ),
+      );
+    }
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
@@ -255,7 +284,6 @@ class UserSearchDelegate extends SearchDelegate<String> {
         .where(
             (user) => user.username.toLowerCase().contains(query.toLowerCase()))
         .toList();
-        
 
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
