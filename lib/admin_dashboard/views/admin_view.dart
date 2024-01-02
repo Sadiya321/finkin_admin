@@ -377,18 +377,15 @@ class _AdminViewState extends State<AdminView> {
           String agentName = snapshot.data?[0] ?? "Defaulte Name";
           String? agentImage = snapshot.data?[1];
 
-          // int loanRequestsCount =
-          //     loanRequestKey.currentState?.allLoans.length ?? 0;
-
           return Scaffold(
             appBar: AppBar(
               title: const Text('Dashboard'),
               automaticallyImplyLeading: false,
               actions: [
                 Text(agentName),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     radius: 20.0,
                     backgroundColor: Colors.grey,
@@ -480,10 +477,6 @@ class _AdminViewState extends State<AdminView> {
                     padding: const EdgeInsets.only(top: 290.0, left: 16.0),
                     child: buildContainer(),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0, right: 16.0),
-                    child: buildTwoContainer(),
-                  ),
                 ]),
               ],
             ),
@@ -512,7 +505,6 @@ class _AdminViewState extends State<AdminView> {
   Widget buildAllAgentsContent() {
     return const AllAgents();
   }
-//******************************************** */
 
   Widget buildDefaultContent() {
     return const Text('Select an item from the drawer to view content.');
@@ -539,13 +531,41 @@ class _AdminViewState extends State<AdminView> {
                     ),
                   ],
                 ),
-                child:
-                    Image.network('assets/images/pro.png', fit: BoxFit.cover),
+                child: const Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Positioned(
+                      top: 20,
+                      child: Image(
+                        image: AssetImage('assets/images/Vector.png'),
+                        width: 40,
+                        height: 75,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 8,
+                      child: Column(
+                        children: [
+                          Text(
+                            '5623',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21,
+                            ),
+                          ),
+                          Text(
+                            'Total Loans',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8.0),
-              Text('Loan Requests()',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -567,12 +587,41 @@ class _AdminViewState extends State<AdminView> {
                     ),
                   ],
                 ),
-                child:
-                    Image.network('assets/images/pro.png', fit: BoxFit.cover),
+                child: const Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Positioned(
+                      top: 20,
+                      child: Image(
+                        image: AssetImage('assets/images/_Accountant_.png'),
+                        width: 40,
+                        height: 75,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 8,
+                      child: Column(
+                        children: [
+                          Text(
+                            '5623',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21,
+                            ),
+                          ),
+                          Text(
+                            'Total Users',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8.0),
-              const Text('Approved Loans()',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -594,12 +643,41 @@ class _AdminViewState extends State<AdminView> {
                     ),
                   ],
                 ),
-                child:
-                    Image.network('assets/images/pro.png', fit: BoxFit.cover),
+                child: const Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Positioned(
+                      top: 20,
+                      child: Image(
+                        image: AssetImage('assets/images/icon _co_.png'),
+                        width: 40,
+                        height: 75,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 8,
+                      child: Column(
+                        children: [
+                          Text(
+                            '5623',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21,
+                            ),
+                          ),
+                          Text(
+                            'Total Agents',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8.0),
-              const Text('All Loans()',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -607,48 +685,48 @@ class _AdminViewState extends State<AdminView> {
     );
   }
 
-  Widget buildTwoContainer() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 150,
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: ScreenColor.textLight,
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
-                  color: ScreenColor.textdivider.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          child: Container(
-            height: 150,
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: ScreenColor.textLight,
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
-                  color: ScreenColor.textdivider.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget buildTwoContainer() {
+  //   return Row(
+  //     children: [
+  //       Expanded(
+  //         child: Container(
+  //           height: 150,
+  //           margin: const EdgeInsets.all(8.0),
+  //           decoration: BoxDecoration(
+  //             color: ScreenColor.textLight,
+  //             borderRadius: BorderRadius.circular(5),
+  //             boxShadow: [
+  //               BoxShadow(
+  //                 color: ScreenColor.textdivider.withOpacity(0.2),
+  //                 spreadRadius: 5,
+  //                 blurRadius: 10,
+  //                 offset: const Offset(0, 3),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       Expanded(
+  //         child: Container(
+  //           height: 150,
+  //           margin: const EdgeInsets.all(8.0),
+  //           decoration: BoxDecoration(
+  //             color: ScreenColor.textLight,
+  //             borderRadius: BorderRadius.circular(5),
+  //             boxShadow: [
+  //               BoxShadow(
+  //                 color: ScreenColor.textdivider.withOpacity(0.2),
+  //                 spreadRadius: 5,
+  //                 blurRadius: 10,
+  //                 offset: const Offset(0, 3),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
