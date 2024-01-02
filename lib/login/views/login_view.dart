@@ -1,10 +1,11 @@
-import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
-import 'package:finkin_admin/widgets/admin_info_track/admin_info.dart';
-import 'package:flutter/material.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/controller/login_controller/login_controller.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../controller/auth_controller/auth_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,7 +14,9 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  final AuthController authController = Get.put(AuthController());
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController otpController = TextEditingController();
   bool canShowOTPField = false;
@@ -30,7 +33,7 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
       vsync: this,
       duration: const Duration(seconds: 3),
     );
-      _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.5).animate(
+    _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.5).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.easeIn,
@@ -38,9 +41,8 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
     );
     _animationController.forward();
   }
-  
-  
-   @override
+
+  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
@@ -63,43 +65,36 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Form(
-                     key: _formKey,
+                    key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         FadeTransition(
-                              opacity: _fadeInAnimation,
-                              child: Image.asset(
-                                'assets/images/hill.png',
-                                width: 250,
-                                height: 350,
-                              ),
-                            ),
-                          const Text(
-                              'Admin Login',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          
+                          opacity: _fadeInAnimation,
+                          child: Image.asset(
+                            'assets/images/hill.png',
+                            width: 250,
+                            height: 350,
+                          ),
+                        ),
+                        const Text(
+                          'Admin Login',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 20),
-
                         Row(
                           children: [
                             Expanded(
-                              child: buildTextField(
-                                "Phone Number",
-                                phoneNumberController,
-                                Icons.phone,
-                                10
-                                
-                              ),
+                              child: buildTextField("Phone Number",
+                                  phoneNumberController, Icons.phone, 10),
                             ),
                           ],
                         ),
                         if (canShowOTPField)
-                          buildTextField("OTP", otpController, Icons.timer,6),
+                          buildTextField("OTP", otpController, Icons.timer, 6),
                         !canShowOTPField
                             ? buildSendOTPBtn("Send OTP")
                             : buildSubmitBtn("Submit"),
@@ -124,14 +119,14 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
                   children: [
                     Text(
                       ' Welcome',
-                      style: TextStyle(
-                          fontSize: 25, color: ScreenColor.textLight),
+                      style:
+                          TextStyle(fontSize: 25, color: ScreenColor.textLight),
                     ),
                     SizedBox(height: 10),
                     Text(
                       'Unlock a world of data-driven insights, instant updates, and streamlined loan management. Securely log in to embark on a seamless journey toward mastering the art of lending.',
-                      style: TextStyle(
-                          fontSize: 18, color: ScreenColor.secondary),
+                      style:
+                          TextStyle(fontSize: 18, color: ScreenColor.secondary),
                     ),
                   ],
                 ),
@@ -143,23 +138,23 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
     );
   }
 
-  Widget buildTextField(String label, TextEditingController controller, IconData icon, int maxLength) {
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: TextField(
-      controller: controller,
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-        LengthLimitingTextInputFormatter(maxLength),
-      ],
-      decoration: InputDecoration(
-        labelText: label,
-        icon: Icon(icon),
+  Widget buildTextField(String label, TextEditingController controller,
+      IconData icon, int maxLength) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: controller,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+          LengthLimitingTextInputFormatter(maxLength),
+        ],
+        decoration: InputDecoration(
+          labelText: label,
+          icon: Icon(icon),
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget buildSendOTPBtn(String text) => ElevatedButton(
         onPressed: () async {
@@ -185,25 +180,24 @@ class _HomePageState extends State<HomePage>with SingleTickerProviderStateMixin 
                 await _firebaseAuth.sendOTP(phoneNumberController.text);
             await _firebaseAuth.authenticateMe(
                 confirmationResult, otpController.text);
-  //               bool isFirstLoginValue = await isFirstLogin();
+            //               bool isFirstLoginValue = await isFirstLogin();
 
-  // if (isFirstLoginValue) {
-  //       // If it's the first login, navigate to AdminInfo
-  //       // ignore: use_build_context_synchronously
-  //       Navigator.pushReplacement(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => const AdminInfo()),
-  //       );
-  //       await markLoginNotFirstTime();
-  //       } else {
-  //       // If not the first login, navigate to AdminView
-  //       // ignore: use_build_context_synchronously
-  //       Navigator.pushReplacement(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => const AdminView(documentId: '',)),
-  //       );
-  //     }
-                 
+            // if (isFirstLoginValue) {
+            //       // If it's the first login, navigate to AdminInfo
+            //       // ignore: use_build_context_synchronously
+            //       Navigator.pushReplacement(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => const AdminInfo()),
+            //       );
+            //       await markLoginNotFirstTime();
+            //       } else {
+            //       // If not the first login, navigate to AdminView
+            //       // ignore: use_build_context_synchronously
+            //       Navigator.pushReplacement(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => const AdminView(documentId: '',)),
+            //       );
+            //     }
           } catch (e) {
             // Handle error
             print("Error authenticating: $e");
@@ -241,7 +235,6 @@ Future<bool> isFirstLogin() async {
   bool isFirstLogin = prefs.getBool('isFirstLogin') ?? true;
   return isFirstLogin;
 }
-
 
 Future<void> markLoginNotFirstTime() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();

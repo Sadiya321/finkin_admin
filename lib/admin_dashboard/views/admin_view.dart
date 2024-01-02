@@ -4,11 +4,13 @@ import 'package:finkin_admin/widgets/all_agents_content/all_agents_content.dart'
 import 'package:finkin_admin/widgets/all_loans_content/all_loans_content.dart';
 import 'package:finkin_admin/widgets/all_users_content/all_users_content.dart';
 import 'package:finkin_admin/widgets/approved_loans_content/approved_loans_content.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/admin_data_controller/adminData_controller.dart';
+import '../../controller/auth_controller/auth_controller.dart';
 import '../../widgets/loan_request_content/loan_request_content.dart';
 
 class AdminView extends StatefulWidget {
@@ -23,6 +25,8 @@ class AdminView extends StatefulWidget {
 }
 
 class _AdminViewState extends State<AdminView> {
+  final _auth = FirebaseAuth.instance;
+  final AuthController authController = Get.put(AuthController());
   List<double> monthlyData = [30, 50, 80, 40, 60, 90, 70, 100, 50, 80, 120, 90];
   final AdminDataController adminDataController =
       Get.put(AdminDataController());
@@ -50,17 +54,81 @@ class _AdminViewState extends State<AdminView> {
             ),
             TextButton(
               onPressed: () {
-                // Perform logout logic here
-                // For example, navigate to the login screen
-                Navigator.of(context).pop(); // Close the dialog
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                ); // Replace with your login screen route
+                _showLogoutConfirmationDialog(context);
               },
               child: const Text('Yes'),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await _auth.signOut();
+      print("User signed out");
+      Get.offAll(HomePage());
+    } catch (e) {
+      print("Error signing out: $e");
+    }
+  }
+
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    "Logout Confirmation",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text("Do you want to Log Out?"),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        primary: ScreenColor.primary,
+                      ),
+                      child: const Text("No"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        primary: ScreenColor.primary,
+                      ),
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        _signOut();
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -246,7 +314,7 @@ class _AdminViewState extends State<AdminView> {
 
   Widget buildDashboardContent() {
     return FutureBuilder<List<String?>>(
-      future: adminDataController.getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+      future: adminDataController.getAdminData(authController.adminId.value),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(

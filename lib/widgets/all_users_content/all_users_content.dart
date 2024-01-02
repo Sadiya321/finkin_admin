@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/admin_data_controller/adminData_controller.dart';
+import '../../controller/auth_controller/auth_controller.dart';
 
 class AllUsers extends StatefulWidget {
   const AllUsers({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class AllUsers extends StatefulWidget {
 }
 
 class _AllUsersState extends State<AllUsers> {
+  final AuthController authController = Get.put(AuthController());
   final AdminDataController adminDataController =
       Get.put(AdminDataController());
   late List<User> allUsers;
@@ -39,8 +41,8 @@ class _AllUsersState extends State<AllUsers> {
             width: 20,
           ),
           FutureBuilder<List<String?>>(
-            future: adminDataController
-                .getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+            future:
+                adminDataController.getAdminData(authController.adminId.value),
             builder: (context, snapshot) {
               String agentName = snapshot.data?[0] ?? "";
               String? agentImage = snapshot.data?[1];

@@ -14,6 +14,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
 
 import '../../controller/admin_data_controller/adminData_controller.dart';
+import '../../controller/auth_controller/auth_controller.dart';
 import '../../loan_info_display/other_display.dart';
 
 class ApprovedLoans extends StatefulWidget {
@@ -24,6 +25,7 @@ class ApprovedLoans extends StatefulWidget {
 }
 
 class _ApprovedLoansState extends State<ApprovedLoans> {
+  final AuthController authController = Get.put(AuthController());
   final AdminDataController adminDataController =
       Get.put(AdminDataController());
   late List<LoanModel> allLoans;
@@ -113,8 +115,8 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
             width: 20,
           ),
           FutureBuilder<List<String?>>(
-            future: adminDataController
-                .getAdminData('wJkiOkXpwHh3osxsrXyVQ2UIUm33'),
+            future:
+                adminDataController.getAdminData(authController.adminId.value),
             builder: (context, snapshot) {
               String agentName = snapshot.data?[0] ?? "";
               String? agentImage = snapshot.data?[1];

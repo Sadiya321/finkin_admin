@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/controller/admin_controller/admin_controller.dart';
+import 'package:finkin_admin/controller/auth_controller/auth_controller.dart';
 import 'package:finkin_admin/loan_model/admin_model.dart';
 import 'package:finkin_admin/repository/admin_repository.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -21,6 +22,7 @@ class AdminInfo extends StatefulWidget {
 
 class _AdminInfoState extends State<AdminInfo> {
   File? _image;
+  final AuthController authController = Get.put(AuthController());
   Uint8List? _imageBytes;
   bool isImageUploaded = false;
   bool isButtonPressed = false;
@@ -133,7 +135,7 @@ class _AdminInfoState extends State<AdminInfo> {
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
                         final admin = AdminModel(
-                          adminId: controller.firstNameController.text.trim(),
+                          adminId: authController.adminId.value,
                           adminName: controller.firstNameController.text.trim(),
                           adminImage: adminController.imageUrl.value,
                         );

@@ -1,7 +1,10 @@
+import 'package:finkin_admin/admin_dashboard/views/admin_view.dart';
 import 'package:finkin_admin/login/views/login_view.dart';
+import 'package:finkin_admin/repository/authentication_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,20 +19,27 @@ void main() async {
           )
         : null,
   );
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+  MyApp({Key? key}) : super(key: key);
+  final authController = AuthenticationRepository();
   @override
   Widget build(BuildContext context) {
+    authController.onReady();
     return MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      home: Obx(() {
+        if (authController.firebaseAgent.value == null) {
+          return const HomePage();
+        } else {
+          return const AdminView(documentId: '');
+        }
+      }),
     );
   }
 }
