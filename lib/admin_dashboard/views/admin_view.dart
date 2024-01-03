@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/login/views/login_view.dart';
 import 'package:finkin_admin/widgets/all_agents_content/all_agents_content.dart';
 import 'package:finkin_admin/widgets/all_loans_content/all_loans_content.dart';
 import 'package:finkin_admin/widgets/all_users_content/all_users_content.dart';
 import 'package:finkin_admin/widgets/approved_loans_content/approved_loans_content.dart';
+import 'package:finkin_admin/widgets/authorized_agents/authorized_agents.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,9 @@ class _AdminViewState extends State<AdminView> {
   List<double> monthlyData = [30, 50, 80, 40, 60, 90, 70, 100, 50, 80, 120, 90];
   final AdminDataController adminDataController =
       Get.put(AdminDataController());
+  CollectionReference analyticsCollection =
+      FirebaseFirestore.instance.collection('Analytics');
+
   String selectedContent = 'Dashboard';
   // final GlobalKey<LoanRequestState> loanRequestKey = GlobalKey();
   void onDrawerItemClicked(String content) {
@@ -196,9 +201,16 @@ class _AdminViewState extends State<AdminView> {
                     const SizedBox(
                       height: 15,
                     ),
-                    buildDrawerItem(Icons.supervised_user_circle, 'All Agents',
-                        () {
+                    buildDrawerItem(
+                        Icons.supervised_user_circle, 'Login request', () {
                       onDrawerItemClicked('All Agents');
+                    }),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    buildDrawerItem(
+                        Icons.supervised_user_circle, 'Authorized Agents', () {
+                      onDrawerItemClicked('Authorized Agents');
                     }),
                     const SizedBox(
                       height: 15,
@@ -269,8 +281,16 @@ class _AdminViewState extends State<AdminView> {
                         height: 15,
                       ),
                       buildDrawerItem(
-                          Icons.supervised_user_circle, 'All Agents', () {
+                          Icons.supervised_user_circle, 'Login request', () {
                         onDrawerItemClicked('All Agents');
+                      }),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      buildDrawerItem(
+                          Icons.supervised_user_circle, 'Authorized Agents',
+                          () {
+                        onDrawerItemClicked('Authorized Agents');
                       }),
                       const SizedBox(
                         height: 15,
@@ -306,6 +326,8 @@ class _AdminViewState extends State<AdminView> {
         return buildAllUsersContent();
       case 'All Agents':
         return buildAllAgentsContent();
+      case 'Authorized Agents':
+        return buildAuthorizedAgentsContent();
 
       default:
         return buildDefaultContent();
@@ -506,6 +528,10 @@ class _AdminViewState extends State<AdminView> {
     return const AllAgents();
   }
 
+  Widget buildAuthorizedAgentsContent() {
+    return const AuthorizedAgents();
+  }
+
   Widget buildDefaultContent() {
     return const Text('Select an item from the drawer to view content.');
   }
@@ -531,10 +557,10 @@ class _AdminViewState extends State<AdminView> {
                     ),
                   ],
                 ),
-                child: const Stack(
+                child: Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
-                    Positioned(
+                    const Positioned(
                       top: 20,
                       child: Image(
                         image: AssetImage('assets/images/Vector.png'),
@@ -544,23 +570,46 @@ class _AdminViewState extends State<AdminView> {
                     ),
                     Positioned(
                       bottom: 8,
-                      child: Column(
-                        children: [
-                          Text(
-                            '5623',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 21,
-                            ),
-                          ),
-                          Text(
-                            'Total Loans',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 21,
-                            ),
-                          ),
-                        ],
+                      child: FutureBuilder<DocumentSnapshot>(
+                        future: analyticsCollection
+                            .doc('V8Pz6BRGn4X09YvAD1CA')
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          }
+
+                          if (snapshot.hasData && snapshot.data != null) {
+                            var totalLoans =
+                                snapshot.data!['TotalLoans'].toString();
+
+                            return Column(
+                              children: [
+                                Text(
+                                  totalLoans,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 21,
+                                  ),
+                                ),
+                                const Text(
+                                  'Total Loans',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 21,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
+                          return const Text('No Loans available');
+                        },
                       ),
                     ),
                   ],
@@ -587,10 +636,10 @@ class _AdminViewState extends State<AdminView> {
                     ),
                   ],
                 ),
-                child: const Stack(
+                child: Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
-                    Positioned(
+                    const Positioned(
                       top: 20,
                       child: Image(
                         image: AssetImage('assets/images/_Accountant_.png'),
@@ -600,23 +649,46 @@ class _AdminViewState extends State<AdminView> {
                     ),
                     Positioned(
                       bottom: 8,
-                      child: Column(
-                        children: [
-                          Text(
-                            '5623',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 21,
-                            ),
-                          ),
-                          Text(
-                            'Total Users',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 21,
-                            ),
-                          ),
-                        ],
+                      child: FutureBuilder<DocumentSnapshot>(
+                        future: analyticsCollection
+                            .doc('V8Pz6BRGn4X09YvAD1CA')
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          }
+
+                          if (snapshot.hasData && snapshot.data != null) {
+                            var totalAgents =
+                                snapshot.data!['TotalLoans'].toString();
+
+                            return Column(
+                              children: [
+                                Text(
+                                  totalAgents,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 21,
+                                  ),
+                                ),
+                                const Text(
+                                  'Total Agents',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 21,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
+                          return const Text('No Agents available');
+                        },
                       ),
                     ),
                   ],
@@ -643,10 +715,10 @@ class _AdminViewState extends State<AdminView> {
                     ),
                   ],
                 ),
-                child: const Stack(
+                child: Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
-                    Positioned(
+                    const Positioned(
                       top: 20,
                       child: Image(
                         image: AssetImage('assets/images/icon _co_.png'),
@@ -656,23 +728,46 @@ class _AdminViewState extends State<AdminView> {
                     ),
                     Positioned(
                       bottom: 8,
-                      child: Column(
-                        children: [
-                          Text(
-                            '5623',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 21,
-                            ),
-                          ),
-                          Text(
-                            'Total Agents',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 21,
-                            ),
-                          ),
-                        ],
+                      child: FutureBuilder<DocumentSnapshot>(
+                        future: analyticsCollection
+                            .doc('V8Pz6BRGn4X09YvAD1CA')
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          }
+
+                          if (snapshot.hasData && snapshot.data != null) {
+                            var totalUsers =
+                                snapshot.data!['TotalUsers'].toString();
+
+                            return Column(
+                              children: [
+                                Text(
+                                  totalUsers,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 21,
+                                  ),
+                                ),
+                                const Text(
+                                  'Total Users',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 21,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
+                          return const Text('No Users available');
+                        },
                       ),
                     ),
                   ],

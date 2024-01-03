@@ -86,7 +86,7 @@ class _AllLoansState extends State<AllLoans> {
             return _buildLoadingIndicator();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No Loan found.'),
+              child: Text('No Loan found.',style: TextStyle(fontSize: 23)),
             );
           }
 

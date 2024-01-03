@@ -29,8 +29,8 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
   final AdminDataController adminDataController =
       Get.put(AdminDataController());
   late List<LoanModel> allLoans;
+   bool isSearching = false;
   late List<LoanModel> displayedLoans;
-  bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   Future<void> _generateAndSavePDF(
     String documentId,
@@ -131,13 +131,13 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
                     width: 20,
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
                       radius: 20.0,
                       backgroundColor: Colors.grey,
                       backgroundImage: agentImage != null
-                          ? NetworkImage(agentImage) as ImageProvider<Object>?
-                          : AssetImage('path_to_default_image')
+                          ? NetworkImage(agentImage)
+                          : const AssetImage('path_to_default_image')
                               as ImageProvider<Object>?,
                     ),
                   ),
@@ -157,8 +157,13 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildLoadingIndicator();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text(' Approved Loans Not Found.'),
+            return  Center(
+              child: Text(
+                 isSearching
+              ? ' Approved Loans Not Found.'
+               : 'No Approved Loans for now',
+                style: const TextStyle(fontSize: 23),
+              ),
             );
           }
 
@@ -181,10 +186,12 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
               .toList();
 
           return displayedLoans.isEmpty
-              ? const Center(
+              ?  Center(
                   child: Text(
-                  'search results Not Found.',
-                  style: TextStyle(fontSize: 26),
+                    isSearching
+                 ? 'Search results not found'
+                    : ' Approved Loans Not found ',
+                  style: const TextStyle(fontSize: 26),
                 ))
               : ListView.builder(
                   itemCount: displayedLoans.length,
@@ -210,7 +217,7 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
                           documentId!,
                           displayedLoans[index].userName,
                           displayedLoans[index].loanType,
-                          displayedLoans[index].panNo,
+                          displayedLoans[index].panNoCpy,
                           displayedLoans[index].pin,
                           displayedLoans[index].email,
                           displayedLoans[index].phone,

@@ -1,20 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
+import 'package:finkin_admin/controller/admin_data_controller/adminData_controller.dart';
+import 'package:finkin_admin/controller/auth_controller/auth_controller.dart';
 import 'package:finkin_admin/widgets/agents_track/agent_track.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controller/admin_data_controller/adminData_controller.dart';
-import '../../controller/auth_controller/auth_controller.dart';
-
-class AllAgents extends StatefulWidget {
-  const AllAgents({Key? key}) : super(key: key);
+class AuthorizedAgents extends StatefulWidget {
+  const AuthorizedAgents({super.key});
 
   @override
-  State<AllAgents> createState() => _AllAgentsState();
+  State<AuthorizedAgents> createState() => _AuthorizedAgentsState();
 }
 
-class _AllAgentsState extends State<AllAgents> {
+class _AuthorizedAgentsState extends State<AuthorizedAgents> {
   final AuthController authController = Get.put(AuthController());
   final AdminDataController adminDataController =
       Get.put(AdminDataController());
@@ -33,9 +32,9 @@ class _AllAgentsState extends State<AllAgents> {
   }
 
   void _loadAllAgents() async {
-    if (!agentsLoaded) {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('Agents').get();
+  if (!agentsLoaded) {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('Agents').where('IsAccepted', isEqualTo: true).get();
 
       setState(() {
         allAgents = querySnapshot.docs.map((DocumentSnapshot document) {
@@ -78,7 +77,7 @@ class _AllAgentsState extends State<AllAgents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'Login request'),
+        title: Text(isSearching ? 'Search Results' : 'AuthorizedAgents'),
         actions: [
           _buildSearchBar(),
           const SizedBox(
@@ -126,7 +125,8 @@ class _AllAgentsState extends State<AllAgents> {
             return _buildErrorWidget();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No Agent found.', style: TextStyle(fontSize: 23)),
+              child: Text('Authorized Agent Not found.',
+                  style: TextStyle(fontSize: 23)),
             );
           }
 
@@ -216,59 +216,23 @@ class _AllAgentsState extends State<AllAgents> {
         ),
       );
     }
-    List<Agent> filteredAgents =
-        displayedAgents.where((agent) => agent.isAccepted != true).toList();
-
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 16.0,
         mainAxisSpacing: 16.0,
       ),
-      itemCount: filteredAgents.length,
+      itemCount: displayedAgents.length,
       itemBuilder: (context, index) {
         return AgentGridItem(
           onPressed: () {
-            _showAgentDetailsDialog(context, filteredAgents[index]);
+            _showAgentDetailsDialog(context, displayedAgents[index]);
           },
-          agent: filteredAgents[index],
+          agent: displayedAgents[index],
           searchQuery: '',
         );
       },
     );
-  }
-
-  /*********/
-
-  void _acceptAgent(String agentId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('Agents')
-          .doc(agentId)
-          .update({'IsAccepted': true});
-
-      allAgents.removeWhere((agent) => agent.id == agentId);
-
-      // Refresh the UI after updating the data
-      _loadAllAgents();
-      _updateDisplayedAgents(searchController.text);
-    } catch (e) {
-      print('Error updating isAccepted field: $e');
-    }
-  }
-
-  void _rejectAgent(String agentId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('Agents')
-          .doc(agentId)
-          .update({'IsAccepted': false});
-
-      // Refresh the UI after updating the data
-      _loadAllAgents();
-    } catch (e) {
-      print('Error updating isAccepted field: $e');
-    }
   }
 
   void _showAgentDetailsDialog(BuildContext context, Agent agent) {
@@ -344,25 +308,6 @@ class _AllAgentsState extends State<AllAgents> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _acceptAgent(agent.id);
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Accept'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _rejectAgent(agent.id);
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Reject'),
-                  ),
-                ],
-              ),
             ],
           ),
           actions: [

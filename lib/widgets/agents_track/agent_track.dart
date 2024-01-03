@@ -1,13 +1,32 @@
 import 'package:flutter/material.dart';
 
 class Agent {
+   String id;
   final String agentname;
   final String agentImage;
   final String email;
   final String phone;
+  final String aadhar;
+  final String address;
+  final String agentType;
+  final String pan;
+  final bool isAccepted;
 
-  Agent(this.agentname, this.agentImage, this.email, this.phone);
+  Agent({
+    required this.id,
+    required this.agentname,
+    required this.agentImage,
+    required this.email,
+    required this.phone,
+    required this.aadhar,
+    required this.address,
+    required this.agentType,
+    required this.pan,
+    required this.isAccepted,
+    
+  });
 }
+
 
 class AgentGridItem extends StatelessWidget {
   final Agent agent;

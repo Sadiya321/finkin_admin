@@ -30,12 +30,14 @@ class LoanModel {
   final String empType;
   final String pin;
   final bool isGranted;
+  final String panNoCpy;
 
   LoanModel(
       {this.id,
       required this.userId,
       required this.agentId,
       required this.empType,
+      required this.panNoCpy,
       required this.nationality,
       required this.pin,
       required this.userImage,
@@ -87,6 +89,7 @@ class LoanModel {
       "BankImg": bankImg,
       "Income": income,
       "MonthlyIncome": monthlyIncome,
+      "PanNoCpy": panNoCpy,
     };
   }
 
@@ -96,6 +99,7 @@ class LoanModel {
     return LoanModel(
       id: document.id,
       userId: data?["UserId"] ?? "",
+      panNoCpy: data?["PanNoCpy"] ?? "",
       userImage: data?["UserImage"] ?? "",
       empType: data?["EmpType"] ?? "",
       nationality: data?["Nationality"] ?? "",

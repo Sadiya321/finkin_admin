@@ -69,7 +69,7 @@ class _LoanRequestState extends State<LoanRequest> {
                     width: 20,
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
                       radius: 20.0,
                       backgroundColor: Colors.grey,
@@ -100,7 +100,7 @@ class _LoanRequestState extends State<LoanRequest> {
                 isSearching
                     ? 'Search results not found'
                     : 'No Loan Requests for now',
-                style: TextStyle(fontSize: 23),
+                style: const TextStyle(fontSize: 23),
               ),
             );
           }
@@ -129,7 +129,7 @@ class _LoanRequestState extends State<LoanRequest> {
                 isSearching
                     ? 'Search results not found'
                     : 'No Loan Requests for now',
-                style: TextStyle(fontSize: 23),
+                style: const TextStyle(fontSize: 23),
               ),
             );
           } else {

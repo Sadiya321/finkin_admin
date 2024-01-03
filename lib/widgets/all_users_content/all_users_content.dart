@@ -82,7 +82,7 @@ class _AllUsersState extends State<AllUsers> {
             return _buildErrorWidget();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No User found.'),
+              child: Text('No User found.',style: TextStyle(fontSize: 23),),
             );
           }
 
