@@ -34,11 +34,14 @@ class _AllUsersState extends State<AllUsers> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'All Users'),
+        title: Text(isSearching ? 'Search Results' : 'All Users',
+          style: MediaQuery.of(context).size.width < 600
+        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
+        : const TextStyle(fontSize: 25), ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
           FutureBuilder<List<String?>>(
             future:
@@ -49,21 +52,19 @@ class _AllUsersState extends State<AllUsers> {
 
               return Row(
                 children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
+                  
                   Text(agentName),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
                       radius: 20.0,
-                      backgroundColor: Colors.grey,
+                      backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
-                          ? NetworkImage(agentImage) as ImageProvider<Object>?
-                          : AssetImage('path_to_default_image')
+                          ? NetworkImage(agentImage)
+                          : const AssetImage('path_to_default_image')
                               as ImageProvider<Object>?,
                     ),
                   ),
@@ -82,7 +83,10 @@ class _AllUsersState extends State<AllUsers> {
             return _buildErrorWidget();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No User found.',style: TextStyle(fontSize: 23),),
+              child: Text(
+                'No User found.',
+                style: TextStyle(fontSize: 23),
+              ),
             );
           }
 
@@ -102,7 +106,7 @@ class _AllUsersState extends State<AllUsers> {
 
   Widget _buildSearchBar() {
     return Container(
-      width: 200.0,
+      width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,
@@ -190,7 +194,6 @@ class _AllUsersState extends State<AllUsers> {
       itemBuilder: (context, index) {
         return UserGridItem(
           onPressed: () {
-            // Handle the onPressed functionality here
             _showAgentDetailsDialog(context, displayedUsers[index]);
           },
           user: displayedUsers[index],
@@ -220,12 +223,12 @@ class _AllUsersState extends State<AllUsers> {
               ),
               const SizedBox(height: 8.0),
               Text(
-                user.email, // Replace with the actual email address
+                user.email, 
                 style: const TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 8.0),
               Text(
-                user.phone, // Replace with the actual phone number
+                user.phone, 
                 style: const TextStyle(fontSize: 16.0),
               ),
             ],
@@ -233,7 +236,7 @@ class _AllUsersState extends State<AllUsers> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('Close'),
             ),

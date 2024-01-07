@@ -64,13 +64,10 @@ class UserInfoController extends GetxController {
         dob.value = DateFormat('dd-MM-yyyy').format(dateTime);
         _updateCurrentStep(status.value);
         if (empType.value == 'Company Worker') {
-          // If yes, update the observable accordingly
           mincome.value = userDoc['Income'] ?? '';
           itReturnImg.value = userDoc['Form16Img'] ?? '';
-          secondImg.value = userDoc['BankImg'] ??
-              ''; // Change this to the desired value or logic
+          secondImg.value = userDoc['BankImg'] ?? '';
         } else {
-          // If no, update it with the value from Firestore
           itReturnImg.value = userDoc['ItReturnImg'] ?? '';
         }
       } else {
@@ -81,20 +78,6 @@ class UserInfoController extends GetxController {
       isLoading(false);
     }
   }
-
-  // void clearControllerValues() {
-  //   address.value = '';
-  //   fullName.value = '';
-  //   email.value = '';
-  //   phone.value = '';
-  //   userid.value = '';
-  //   imageUrl.value = '';
-  //   status.value = '';
-  //   aadharImg.value = '';
-  //   panImg.value = '';
-  //   itReturnImg.value = '';
-  //   secondImg.value = '';
-  // }
 
   Future<void> fetchAgentDetails(String agentId) async {
     try {
@@ -111,10 +94,7 @@ class UserInfoController extends GetxController {
         print("User details fetched successfully: $userDoc");
 
         agentImg.value = userDoc['ImageUrl'] ?? '';
-      } else {
-        // print("User with agentId $agentId not found");
-        // Get.to(UserNav());
-      }
+      } else {}
     } catch (e) {
       print("Error fetching user details: $e");
     } finally {

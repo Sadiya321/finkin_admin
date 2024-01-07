@@ -53,13 +53,13 @@ class _AdminInfoState extends State<AdminInfo> {
                       width: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.grey.withOpacity(0.4),
+                        color:  ScreenColor.subtext.withOpacity(0.4),
                       ),
                       child: _imageBytes == null
                           ? const Icon(
                               Icons.person,
                               size: 60,
-                              color: Colors.white,
+                              color: ScreenColor.textLight,
                             )
                           : ClipOval(
                               child: Image.memory(
@@ -86,7 +86,7 @@ class _AdminInfoState extends State<AdminInfo> {
                           ),
                           child: const Icon(
                             Icons.camera_alt,
-                            color: Colors.white,
+                            color: ScreenColor.textLight,
                             size: 15,
                           ),
                         ),
@@ -96,7 +96,7 @@ class _AdminInfoState extends State<AdminInfo> {
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
-                  width: 200, // Adjust the width as needed
+                  width: 200,
                   child: TextFormField(
                     controller: controller.firstNameController,
                     decoration: InputDecoration(
@@ -132,6 +132,7 @@ class _AdminInfoState extends State<AdminInfo> {
                           ),
                           backgroundColor: ScreenColor.primary,
                         );
+                        // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
                         final admin = AdminModel(
@@ -144,10 +145,11 @@ class _AdminInfoState extends State<AdminInfo> {
                             .collection("Admin")
                             .add(admin.toJson());
 
+                        // ignore: use_build_context_synchronously
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AdminView(
+                              builder: (context) => const AdminView(
                                     documentId: '',
                                   )),
                         );
@@ -157,21 +159,22 @@ class _AdminInfoState extends State<AdminInfo> {
                             'Error uploading image. Please try again.',
                             style: TextStyle(color: ScreenColor.textLight),
                           ),
-                          backgroundColor: Colors.red,
+                          backgroundColor: ScreenColor.errorbar,
                         );
+                        // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.deepPurple,
+                    backgroundColor: ScreenColor.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
                   child: const Text(
                     'Save',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color:  ScreenColor.textLight,),
                   ),
                 ),
               ],
@@ -190,12 +193,10 @@ class _AdminInfoState extends State<AdminInfo> {
             .ref()
             .child('Admin/${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-        // Use putData() instead of putFile() for web
         final firebase_storage.UploadTask uploadTask =
             storageRef.putData(_imageBytes!);
 
-        final firebase_storage.TaskSnapshot downloadSnapshot =
-            await uploadTask; // Await the completion of the task
+        final firebase_storage.TaskSnapshot downloadSnapshot = await uploadTask;
 
         if (downloadSnapshot.state == firebase_storage.TaskState.success) {
           final String imageUrl = await downloadSnapshot.ref.getDownloadURL();
@@ -231,7 +232,7 @@ class _AdminInfoState extends State<AdminInfo> {
 
       if (pickedFile != null) {
         setState(() {
-          _imageBytes = pickedFile; // Store the image bytes directly
+          _imageBytes = pickedFile;
         });
       }
     } catch (e) {

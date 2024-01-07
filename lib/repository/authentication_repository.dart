@@ -24,8 +24,5 @@ class AuthenticationRepository extends GetxController {
   void _setInitialScreen(User? user) {
     firebaseAgent.value = user;
     authController.isUserExist(user?.phoneNumber?.substring(3) ?? '123');
-    // user == null
-    //     ? Get.offAll(() => const SplashScreen())
-    //     : Get.toEnd(() => const BottomNavBar());
   }
 }

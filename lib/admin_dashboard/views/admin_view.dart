@@ -36,108 +36,24 @@ class _AdminViewState extends State<AdminView> {
       FirebaseFirestore.instance.collection('Analytics');
 
   String selectedContent = 'Dashboard';
-  // final GlobalKey<LoanRequestState> loanRequestKey = GlobalKey();
   void onDrawerItemClicked(String content) {
     setState(() {
       selectedContent = content;
     });
   }
 
-  void showLogoutConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Log Out'),
-          content: const Text('Are you sure you want to log out?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                _showLogoutConfirmationDialog(context);
-              },
-              child: const Text('Yes'),
-            ),
-          ],
-        );
-      },
+Future<void> _signOut() async {
+  try {
+    await _auth.signOut();
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const HomePage()),
     );
+  } catch (e) {
+    print("Error signing out: $e");
   }
+}
 
-  Future<void> _signOut() async {
-    try {
-      await _auth.signOut();
-      print("User signed out");
-      Get.offAll(HomePage());
-    } catch (e) {
-      print("Error signing out: $e");
-    }
-  }
-
-  void _showLogoutConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    "Logout Confirmation",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text("Do you want to Log Out?"),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        primary: ScreenColor.primary,
-                      ),
-                      child: const Text("No"),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        primary: ScreenColor.primary,
-                      ),
-                      child: const Text("Yes"),
-                      onPressed: () {
-                        _signOut();
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -350,7 +266,7 @@ class _AdminViewState extends State<AdminView> {
                   padding: EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     radius: 20.0,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: ScreenColor.subtext,
                   ),
                 ),
               ],
@@ -369,7 +285,7 @@ class _AdminViewState extends State<AdminView> {
                   padding: EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     radius: 20.0,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: ScreenColor.subtext,
                   ),
                 ),
               ],
@@ -388,7 +304,7 @@ class _AdminViewState extends State<AdminView> {
                   padding: EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     radius: 20.0,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: ScreenColor.subtext,
                   ),
                 ),
               ],
@@ -410,7 +326,7 @@ class _AdminViewState extends State<AdminView> {
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     radius: 20.0,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: ScreenColor.subtext,
                     backgroundImage: agentImage != null
                         ? NetworkImage(agentImage)
                         : const AssetImage('assets/images/hill.png')
@@ -780,60 +696,47 @@ class _AdminViewState extends State<AdminView> {
     );
   }
 
-  // Widget buildTwoContainer() {
-  //   return Row(
-  //     children: [
-  //       Expanded(
-  //         child: Container(
-  //           height: 150,
-  //           margin: const EdgeInsets.all(8.0),
-  //           decoration: BoxDecoration(
-  //             color: ScreenColor.textLight,
-  //             borderRadius: BorderRadius.circular(5),
-  //             boxShadow: [
-  //               BoxShadow(
-  //                 color: ScreenColor.textdivider.withOpacity(0.2),
-  //                 spreadRadius: 5,
-  //                 blurRadius: 10,
-  //                 offset: const Offset(0, 3),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //       Expanded(
-  //         child: Container(
-  //           height: 150,
-  //           margin: const EdgeInsets.all(8.0),
-  //           decoration: BoxDecoration(
-  //             color: ScreenColor.textLight,
-  //             borderRadius: BorderRadius.circular(5),
-  //             boxShadow: [
-  //               BoxShadow(
-  //                 color: ScreenColor.textdivider.withOpacity(0.2),
-  //                 spreadRadius: 5,
-  //                 blurRadius: 10,
-  //                 offset: const Offset(0, 3),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
       leading: Icon(icon, color: ScreenColor.textLight),
       title: Text(title, style: const TextStyle(color: ScreenColor.textLight)),
-      onTap: () {
+      onTap: () async {
         if (title == 'Log Out') {
-          showLogoutConfirmationDialog(context);
+          bool? confirmed = await showLogoutConfirmationDialog(context);
+          if (confirmed == true) {
+            await _signOut();
+          }
         } else {
           onTap();
         }
       },
     );
   }
+
+  Future<bool?> showLogoutConfirmationDialog(BuildContext context) async {
+  return showDialog<bool?>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Logout Confirmation'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop(true);
+              await _signOut();
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      );
+    },
+  );
+}
 }

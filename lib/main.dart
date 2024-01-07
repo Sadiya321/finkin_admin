@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         if (authController.firebaseAgent.value == null) {
           return const HomePage();
         } else {
-          return const AdminView(documentId: '');
+          return const AdminView(documentId: '',);
         }
       }),
     );

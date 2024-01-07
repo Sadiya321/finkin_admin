@@ -26,21 +26,21 @@ class FirebaseAuthentication {
       if (userCredential.additionalUserInfo!.isNewUser) {
         printMessage("Successful Authentication");
 
-        // Navigate to the screen for successful authentication
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AdminInfo(),
+            builder: (context) => const AdminInfo(),
           ),
         );
       } else {
-        printMessage("User already exists");
-
-        // Navigate to the screen for existing users
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AdminView(documentId: '',),
+            builder: (context) => const AdminView(
+              documentId: '',
+            ),
           ),
         );
       }

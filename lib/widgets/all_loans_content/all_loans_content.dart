@@ -13,6 +13,7 @@ class AllLoans extends StatefulWidget {
   const AllLoans({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _AllLoansState createState() => _AllLoansState();
 }
 
@@ -36,11 +37,14 @@ class _AllLoansState extends State<AllLoans> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'All Loans'),
+        title: Text(isSearching ? 'Search Results' : 'All Loans',
+          style: MediaQuery.of(context).size.width < 600
+        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
+        : const TextStyle(fontSize: 25), ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
           FutureBuilder<List<String?>>(
             future:
@@ -51,21 +55,19 @@ class _AllLoansState extends State<AllLoans> {
 
               return Row(
                 children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
+                  
                   Text(agentName),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
                       radius: 20.0,
-                      backgroundColor: Colors.grey,
+                       backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
-                          ? NetworkImage(agentImage) as ImageProvider<Object>?
-                          : AssetImage('path_to_default_image')
+                          ? NetworkImage(agentImage)
+                          : const AssetImage('path_to_default_image')
                               as ImageProvider<Object>?,
                     ),
                   ),
@@ -86,7 +88,7 @@ class _AllLoansState extends State<AllLoans> {
             return _buildLoadingIndicator();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: Text('No Loan found.',style: TextStyle(fontSize: 23)),
+              child: Text('No Loan found.', style: TextStyle(fontSize: 23)),
             );
           }
 
@@ -95,8 +97,6 @@ class _AllLoansState extends State<AllLoans> {
                       LoanModel.fromSnapshot(doc))
                   .toList() ??
               [];
-
-          // Update displayedLoans based on the search criteria
           displayedLoans = allLoans
               .where((loan) =>
                   loan.userName
@@ -166,7 +166,7 @@ class _AllLoansState extends State<AllLoans> {
 
   Widget _buildSearchBar() {
     return Container(
-      width: 200.0,
+       width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,

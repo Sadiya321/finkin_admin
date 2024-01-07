@@ -28,13 +28,15 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
     super.initState();
     allAgents = [];
     displayedAgents = [];
-    _loadAllAgents(); // Load all agents initially
+    _loadAllAgents();
   }
 
   void _loadAllAgents() async {
-  if (!agentsLoaded) {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('Agents').where('IsAccepted', isEqualTo: true).get();
+    if (!agentsLoaded) {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Agents')
+          .where('IsAccepted', isEqualTo: true)
+          .get();
 
       setState(() {
         allAgents = querySnapshot.docs.map((DocumentSnapshot document) {
@@ -62,11 +64,9 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
   void _updateDisplayedAgents(String query) {
     setState(() {
       if (query.isEmpty) {
-        // If the query is empty, show all agents
         isSearching = false;
         displayedAgents = allAgents;
       } else {
-        // Otherwise, perform the search
         isSearching = true;
         displayedAgents = _performSearch(query);
       }
@@ -77,11 +77,14 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'AuthorizedAgents'),
+        title: Text(isSearching ? 'Search Results' : 'Authorized Agents',
+          style: MediaQuery.of(context).size.width < 600
+        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
+        : const TextStyle(fontSize: 25), ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
           FutureBuilder<List<String?>>(
             future:
@@ -92,18 +95,16 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
 
               return Row(
                 children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
+                 
                   Text(agentName),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: CircleAvatar(
+                    child:  CircleAvatar(
                       radius: 20.0,
-                      backgroundColor: Colors.grey,
+                       backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
                           ? NetworkImage(agentImage)
                           : const AssetImage('path_to_default_image')
@@ -139,7 +140,7 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
 
   Widget _buildSearchBar() {
     return Container(
-      width: 200.0,
+       width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,

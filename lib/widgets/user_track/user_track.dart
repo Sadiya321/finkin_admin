@@ -21,7 +21,7 @@ class UserGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: onPressed, // Execute the onPressed callback on tap
+        onTap: onPressed, 
         child: Column(
           children: [
             Container(

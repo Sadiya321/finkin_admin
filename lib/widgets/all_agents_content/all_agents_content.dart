@@ -29,7 +29,7 @@ class _AllAgentsState extends State<AllAgents> {
     super.initState();
     allAgents = [];
     displayedAgents = [];
-    _loadAllAgents(); // Load all agents initially
+    _loadAllAgents();
   }
 
   void _loadAllAgents() async {
@@ -63,11 +63,9 @@ class _AllAgentsState extends State<AllAgents> {
   void _updateDisplayedAgents(String query) {
     setState(() {
       if (query.isEmpty) {
-        // If the query is empty, show all agents
         isSearching = false;
         displayedAgents = allAgents;
       } else {
-        // Otherwise, perform the search
         isSearching = true;
         displayedAgents = _performSearch(query);
       }
@@ -78,11 +76,14 @@ class _AllAgentsState extends State<AllAgents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'Login request'),
+        title: Text(isSearching ? 'Search Results' : 'Login request',
+          style: MediaQuery.of(context).size.width < 600
+        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
+        : const TextStyle(fontSize: 25), ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
           FutureBuilder<List<String?>>(
             future:
@@ -93,18 +94,16 @@ class _AllAgentsState extends State<AllAgents> {
 
               return Row(
                 children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
+                  
                   Text(agentName),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
                       radius: 20.0,
-                      backgroundColor: Colors.grey,
+                       backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
                           ? NetworkImage(agentImage)
                           : const AssetImage('path_to_default_image')
@@ -139,7 +138,7 @@ class _AllAgentsState extends State<AllAgents> {
 
   Widget _buildSearchBar() {
     return Container(
-      width: 200.0,
+       width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,
@@ -238,8 +237,6 @@ class _AllAgentsState extends State<AllAgents> {
     );
   }
 
-  /*********/
-
   void _acceptAgent(String agentId) async {
     try {
       await FirebaseFirestore.instance
@@ -249,7 +246,6 @@ class _AllAgentsState extends State<AllAgents> {
 
       allAgents.removeWhere((agent) => agent.id == agentId);
 
-      // Refresh the UI after updating the data
       _loadAllAgents();
       _updateDisplayedAgents(searchController.text);
     } catch (e) {
@@ -264,7 +260,6 @@ class _AllAgentsState extends State<AllAgents> {
           .doc(agentId)
           .update({'IsAccepted': false});
 
-      // Refresh the UI after updating the data
       _loadAllAgents();
     } catch (e) {
       print('Error updating isAccepted field: $e');

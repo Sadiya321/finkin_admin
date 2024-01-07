@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AdminController extends GetxController{
+class AdminController extends GetxController {
   RxString imageUrl = ''.obs;
   final formKey = GlobalKey<FormState>();
   final TextEditingController firstNameController = TextEditingController();
-   static const String nameRegex = r'^[A-Za-z\s]+$';
+  static const String nameRegex = r'^[A-Za-z\s]+$';
 
-     bool validateForm() {
+  bool validateForm() {
     if (formKey.currentState!.validate()) {
       Get.snackbar('Success', 'Saving Details');
 

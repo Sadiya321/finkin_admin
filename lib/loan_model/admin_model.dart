@@ -5,17 +5,14 @@ class AdminModel {
   final String adminId;
   final String adminImage;
   final String adminName;
- 
 
-  AdminModel(
-      {this.id,
-      required this.adminId,
-      required this.adminImage,
-      required this.adminName,
-      }
-  );
+  AdminModel({
+    this.id,
+    required this.adminId,
+    required this.adminImage,
+    required this.adminName,
+  });
 
-  
   toJson() {
     return {
       "AdminId": adminId,
@@ -32,7 +29,6 @@ class AdminModel {
       adminId: data?["AdminId"] ?? "",
       adminImage: data?["AdminImage"] ?? "",
       adminName: data?["AdminName"] ?? "",
-     
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:flutter/material.dart';
 
 class Agent {
@@ -42,7 +43,7 @@ class AgentGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: onPressed, // Execute the onPressed callback on tap
+        onTap: onPressed, 
         child: Column(
           children: [
             Container(
@@ -50,7 +51,7 @@ class AgentGridItem extends StatelessWidget {
               height: 90.0,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 2.0),
+                border: Border.all(color: ScreenColor.combination, width: 2.0),
                 image: DecorationImage(
                   image: NetworkImage(agent.agentImage),
                   fit: BoxFit.cover,

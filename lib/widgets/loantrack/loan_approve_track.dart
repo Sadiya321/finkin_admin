@@ -50,15 +50,16 @@ class LoanAppTrack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedDate = DateFormat.yMMMd().format(date);
+    bool isMobile = MediaQuery.of(context).size.width < 600;
 
     return GestureDetector(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(isMobile ? 8.0 : 10.0),
           decoration: BoxDecoration(
             color: ScreenColor.textLight,
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(isMobile ? 16.0 : 26.0),
             border: Border.all(
               color: Colors.black,
               width: 1.0,
@@ -70,14 +71,14 @@ class LoanAppTrack extends StatelessWidget {
               Row(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(isMobile ? 12.0 : 22.0),
                     child: SizedBox(
-                      width: 48,
-                      height: 48,
+                      width: isMobile ? 36 : 48,
+                      height: isMobile ? 36 : 48,
                       child: Image.network(
                         imageAsset,
-                        width: 48,
-                        height: 48,
+                        width: isMobile ? 36 : 48,
+                        height: isMobile ? 36 : 48,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -90,27 +91,27 @@ class LoanAppTrack extends StatelessWidget {
                     children: [
                       Text(
                         userName,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: isMobile ? 14 : 18,
                           fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 2,
+                        maxLines: 1,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         loanType,
-                        style: const TextStyle(fontSize: 10),
+                        style: TextStyle(fontSize: isMobile ? 16 : 20),
                         softWrap: false,
                         maxLines: 1,
-                        overflow: TextOverflow.fade,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
               const SizedBox(
-                width: 18,
+                width: 12,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -120,17 +121,16 @@ class LoanAppTrack extends StatelessWidget {
                       Icon(
                         icon,
                         color: ScreenColor.icon,
+                        size: isMobile ? 20 : 24,
                       ),
-                      const SizedBox(width: 2),
-                      // New download icon
                       IconButton(
                         onPressed: onDownloadPressed,
                         icon: Icon(
                           downloadIcon,
                           color: ScreenColor.icon,
+                          size: isMobile ? 20 : 24,
                         ),
                       ),
-                      const Text('Download'),
                     ],
                   ),
                 ],
@@ -146,11 +146,11 @@ class LoanAppTrack extends StatelessWidget {
                   ),
                   Text(
                     formattedDate,
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: isMobile ? 10 : 12),
                   ),
                   Text(
                     status.name,
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: isMobile ? 10 : 12),
                   ),
                 ],
               ),
@@ -158,10 +158,11 @@ class LoanAppTrack extends StatelessWidget {
               ElevatedButton(
                 onPressed: onPressed,
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.blue,
-                  onPrimary: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0), // Adjust button padding
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
                 ),
-                child: const Text('Open'),
+                child: Text('Open', style: TextStyle(fontSize: isMobile ? 10 : 14)), // Adjust text size for mobile
               ),
             ],
           ),

@@ -2,6 +2,7 @@ import 'dart:html' as html;
 import 'dart:typed_data' show Uint8List;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finkin_admin/api/pdf_api.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/loan_model/loan_model.dart';
 import 'package:finkin_admin/res/constants/enums/enums.dart';
@@ -21,6 +22,7 @@ class ApprovedLoans extends StatefulWidget {
   const ApprovedLoans({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _ApprovedLoansState createState() => _ApprovedLoansState();
 }
 
@@ -29,7 +31,7 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
   final AdminDataController adminDataController =
       Get.put(AdminDataController());
   late List<LoanModel> allLoans;
-   bool isSearching = false;
+  bool isSearching = false;
   late List<LoanModel> displayedLoans;
   TextEditingController searchController = TextEditingController();
   Future<void> _generateAndSavePDF(
@@ -82,18 +84,15 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
       ),
     );
 
-    // Save the PDF
     final bytes = await pdf.save();
     final blob = html.Blob([Uint8List.fromList(bytes)]);
     final url = html.Url.createObjectUrlFromBlob(blob);
 
-    // Trigger a download
     html.AnchorElement(href: url)
       ..target = 'blank'
       ..download = '$documentId.pdf'
       ..click();
 
-    // Clean up
     html.Url.revokeObjectUrl(url);
   }
 
@@ -108,11 +107,14 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'Approved Loans'),
+        title: Text(isSearching ? 'Search Results' : 'Approved Loans',
+          style: MediaQuery.of(context).size.width < 600
+        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
+        : const TextStyle(fontSize: 25), ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
           FutureBuilder<List<String?>>(
             future:
@@ -123,12 +125,10 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
 
               return Row(
                 children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
+                  
                   Text(agentName),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -157,11 +157,11 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildLoadingIndicator();
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return  Center(
+            return Center(
               child: Text(
-                 isSearching
-              ? ' Approved Loans Not Found.'
-               : 'No Approved Loans for now',
+                isSearching
+                    ? ' Approved Loans Not Found.'
+                    : 'No Approved Loans for now',
                 style: const TextStyle(fontSize: 23),
               ),
             );
@@ -174,7 +174,6 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
                   .toList() ??
               [];
 
-          // Update displayedLoans based on the search criteria
           displayedLoans = allLoans
               .where((loan) =>
                   loan.userName
@@ -186,11 +185,11 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
               .toList();
 
           return displayedLoans.isEmpty
-              ?  Center(
+              ? Center(
                   child: Text(
-                    isSearching
-                 ? 'Search results not found'
-                    : ' Approved Loans Not found ',
+                  isSearching
+                      ? 'Search results not found'
+                      : ' Approved Loans Not found ',
                   style: const TextStyle(fontSize: 26),
                 ))
               : ListView.builder(
@@ -212,23 +211,11 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
                       income: displayedLoans[index].combinedIncome,
                       dob: displayedLoans[index].date,
                       downloadIcon: Icons.download,
-                      onDownloadPressed: () {
-                        _generateAndSavePDF(
-                          documentId!,
-                          displayedLoans[index].userName,
-                          displayedLoans[index].loanType,
-                          displayedLoans[index].panNoCpy,
-                          displayedLoans[index].pin,
-                          displayedLoans[index].email,
-                          displayedLoans[index].phone,
-                          displayedLoans[index].aadharNo,
-                          displayedLoans[index].nationality,
-                          displayedLoans[index].address,
-                          displayedLoans[index].empType,
-                          displayedLoans[index].combinedIncome,
-                          displayedLoans[index].date,
-                          // displayedLoans[index].panImg,
-                        );
+                      onDownloadPressed: () async {
+                        final documentId = displayedLoans[index].id;
+                        if (documentId != null) {
+                          await PdfApi.generatePdfForLoan(documentId);
+                        }
                       },
                       onPressed: () {
                         Navigator.of(context).push(
@@ -274,7 +261,8 @@ class _ApprovedLoansState extends State<ApprovedLoans> {
 
   Widget _buildSearchBar() {
     return Container(
-      width: 200.0,
+     width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
+    
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,

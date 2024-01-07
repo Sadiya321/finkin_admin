@@ -14,6 +14,7 @@ class LoanRequest extends StatefulWidget {
   const LoanRequest({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoanRequestState createState() => _LoanRequestState();
 }
 
@@ -30,9 +31,7 @@ class _LoanRequestState extends State<LoanRequest> {
   }
 
   int getDisplayedLoansCount() {
-    // Replace this logic with your actual logic to count displayed loans
-    return displayedLoans
-        .length; // Assuming displayedLoans contains the requested loans
+    return displayedLoans.length;
   }
 
   @override
@@ -46,36 +45,37 @@ class _LoanRequestState extends State<LoanRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'Loan Requests'),
+        title: Text(isSearching ? 'Search Results' : 'Loan Requests',
+         style: MediaQuery.of(context).size.width < 600
+        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
+        : const TextStyle(fontSize: 25), ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
           FutureBuilder<List<String?>>(
-            future: adminDataController
-                .getAdminData(authController.adminId.value),
+            future:
+                adminDataController.getAdminData(authController.adminId.value),
             builder: (context, snapshot) {
               String agentName = snapshot.data?[0] ?? "";
               String? agentImage = snapshot.data?[1];
 
               return Row(
                 children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
+                 
                   Text(agentName),
                   const SizedBox(
-                    width: 20,
+                    width: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
                       radius: 20.0,
-                      backgroundColor: Colors.grey,
+                       backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
-                          ? NetworkImage(agentImage) as ImageProvider<Object>?
-                          : AssetImage('path_to_default_image')
+                          ? NetworkImage(agentImage)
+                          : const AssetImage('path_to_default_image')
                               as ImageProvider<Object>?,
                     ),
                   ),
@@ -112,7 +112,6 @@ class _LoanRequestState extends State<LoanRequest> {
                   .toList() ??
               [];
 
-          // Update displayedLoans based on the search criteria
           displayedLoans = allLoans
               .where((loan) =>
                   loan.userName
@@ -186,7 +185,7 @@ class _LoanRequestState extends State<LoanRequest> {
 
   Widget _buildSearchBar() {
     return Container(
-      width: 200.0,
+       width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,

@@ -23,8 +23,9 @@ class _HomePageState extends State<HomePage>
   late FirebaseAuthentication _firebaseAuth;
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _leftFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _rightFormKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -50,13 +51,17 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isMobileView = screenWidth < 600;
     return Scaffold(
       body: Stack(
         children: [
           Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
-              width: MediaQuery.of(context).size.width / 3,
+              width: isMobileView
+                  ? MediaQuery.of(context).size.width // Center in mobile view
+                  : MediaQuery.of(context).size.width / 3,
               child: Card(
                 elevation: 0,
                 shape: const RoundedRectangleBorder(
@@ -65,7 +70,7 @@ class _HomePageState extends State<HomePage>
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Form(
-                    key: _formKey,
+                     key: _leftFormKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -112,23 +117,97 @@ class _HomePageState extends State<HomePage>
               clipper: WaveClipper(),
               child: Container(
                 color: ScreenColor.primary,
-                padding: const EdgeInsets.all(200.0),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       ' Welcome',
                       style:
                           TextStyle(fontSize: 25, color: ScreenColor.textLight),
                     ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Unlock a world of data-driven insights, instant updates, and streamlined loan management. Securely log in to embark on a seamless journey toward mastering the art of lending.',
-                      style:
-                          TextStyle(fontSize: 18, color: ScreenColor.secondary),
+                    const SizedBox(height: 10),
+                    LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        double maxTextWidth =
+                            constraints.maxWidth - 10.0; // Adjust for padding
+                        double fontSize = 18.0;
+                        if (maxTextWidth < 400) {
+                          fontSize = 14.0;
+                        } else if (maxTextWidth < 600) {
+                          fontSize = 17.0;
+                        }
+
+                        return Center(
+                          child: Text(
+                            'Unlock a world of data-driven insights, instant updates, and streamlined loan management. Securely log in to embark on a seamless journey toward mastering the art of lending.',
+                            style: TextStyle(
+                                fontSize: fontSize,
+                                color: ScreenColor.secondary),
+                          ),
+                        );
+                      },
                     ),
                   ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                width: isMobileView
+                    ? MediaQuery.of(context).size.width 
+                    : MediaQuery.of(context).size.width / 3,
+                child: Card(
+                  elevation: 0,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Form(
+                     key: _rightFormKey, 
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          FadeTransition(
+                            opacity: _fadeInAnimation,
+                            child: Image.asset(
+                              'assets/images/hill.png',
+                              width: 250,
+                              height: 350,
+                            ),
+                          ),
+                          const Text(
+                            'Admin Login',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: buildTextField("Phone Number",
+                                    phoneNumberController, Icons.phone, 10),
+                              ),
+                            ],
+                          ),
+                          if (canShowOTPField)
+                            buildTextField(
+                                "OTP", otpController, Icons.timer, 6),
+                          !canShowOTPField
+                              ? buildSendOTPBtn("Send OTP")
+                              : buildSubmitBtn("Submit"),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -159,14 +238,10 @@ class _HomePageState extends State<HomePage>
   Widget buildSendOTPBtn(String text) => ElevatedButton(
         onPressed: () async {
           try {
-            var confirmationResult =
-                await _firebaseAuth.sendOTP(phoneNumberController.text);
             setState(() {
               canShowOTPField = !canShowOTPField;
             });
-            // Do something with confirmationResult if needed
           } catch (e) {
-            // Handle error
             print("Error sending OTP: $e");
           }
         },
@@ -180,26 +255,7 @@ class _HomePageState extends State<HomePage>
                 await _firebaseAuth.sendOTP(phoneNumberController.text);
             await _firebaseAuth.authenticateMe(
                 confirmationResult, otpController.text);
-            //               bool isFirstLoginValue = await isFirstLogin();
-
-            // if (isFirstLoginValue) {
-            //       // If it's the first login, navigate to AdminInfo
-            //       // ignore: use_build_context_synchronously
-            //       Navigator.pushReplacement(
-            //         context,
-            //         MaterialPageRoute(builder: (context) => const AdminInfo()),
-            //       );
-            //       await markLoginNotFirstTime();
-            //       } else {
-            //       // If not the first login, navigate to AdminView
-            //       // ignore: use_build_context_synchronously
-            //       Navigator.pushReplacement(
-            //         context,
-            //         MaterialPageRoute(builder: (context) => const AdminView(documentId: '',)),
-            //       );
-            //     }
           } catch (e) {
-            // Handle error
             print("Error authenticating: $e");
           }
         },

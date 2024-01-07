@@ -31,6 +31,8 @@ class LoanModel {
   final String pin;
   final bool isGranted;
   final String panNoCpy;
+   final String logo;
+  
 
   LoanModel(
       {this.id,
@@ -60,6 +62,7 @@ class LoanModel {
       required this.income,
       required this.monthlyIncome,
       required this.isGranted,
+       required this.logo,
       this.status = LoanStatus.pending});
 
   toJson() {
@@ -90,6 +93,7 @@ class LoanModel {
       "Income": income,
       "MonthlyIncome": monthlyIncome,
       "PanNoCpy": panNoCpy,
+      "Logo": logo,
     };
   }
 
@@ -125,6 +129,7 @@ class LoanModel {
       image: data?['Image'] ?? "",
       itReturnImg: data?["ItReturnImg"] ?? "",
       secondImg: data?["SecondImg"] ?? "",
+      logo: data?["Logo"] ?? "",
     );
   }
   String get combinedIncome {

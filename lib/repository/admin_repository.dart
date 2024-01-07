@@ -18,11 +18,10 @@ class AdminRepository extends GetxController {
           backgroundColor: ScreenColor.icon.withOpacity(0.1),
           colorText: ScreenColor.icon);
 
-      // Navigate to the desired screen after success
-      Get.to(AdminView(
+      Get.to(const AdminView(
         documentId: '',
-      )); // Replace NextScreen with your desired screen
-    } catch (error, stackTrace) {
+      ));
+    } catch (error) {
       Get.snackbar("Error", "Something went wrong. Try again",
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: ScreenColor.icon.withOpacity(0.1),
