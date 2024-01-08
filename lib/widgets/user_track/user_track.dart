@@ -20,29 +20,34 @@ class UserGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+
+    double imageSize = isSmallScreen ? 50.0 : 90.0;
+    double fontSize = isSmallScreen ? 12.0 : 16.0; // Adjusted font size for mobile view
+
     return GestureDetector(
-        onTap: onPressed, 
-        child: Column(
-          children: [
-            Container(
-              width: 90.0,
-              height: 90.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 2.0),
-                image: DecorationImage(
-                  image: NetworkImage(user.userImage),
-                  fit: BoxFit.cover,
-                ),
+      onTap: onPressed,
+      child: Column(
+        children: [
+          Container(
+            width: imageSize,
+            height: imageSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black, width: 2.0),
+              image: DecorationImage(
+                image: NetworkImage(user.userImage),
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 8.0),
-            Text(
-              user.username,
-              style:
-                  const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ));
+          ),
+          const SizedBox(height: 8.0),
+          Text(
+            user.username,
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.normal),
+          ),
+        ],
+      ),
+    );
   }
 }

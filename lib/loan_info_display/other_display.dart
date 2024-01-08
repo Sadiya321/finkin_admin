@@ -86,10 +86,8 @@ class _OtherDisplayState extends State<OtherDisplay> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             if (constraints.maxWidth < 600) {
-              // Mobile View
               return buildMobileUI();
             } else {
-              // Desktop View
               return buildDesktopUI(constraints);
             }
           },

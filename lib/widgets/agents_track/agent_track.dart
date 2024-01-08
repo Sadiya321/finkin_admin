@@ -34,37 +34,44 @@ class AgentGridItem extends StatelessWidget {
   final String searchQuery;
   final VoidCallback? onPressed;
 
-  const AgentGridItem(
-      {super.key,
-      required this.agent,
-      required this.searchQuery,
-      this.onPressed});
+  const AgentGridItem({
+    Key? key,
+    required this.agent,
+    required this.searchQuery,
+    this.onPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    bool isPhone = MediaQuery.of(context).size.width < 600; // Adjust the threshold as needed
+
     return GestureDetector(
-        onTap: onPressed, 
-        child: Column(
-          children: [
-            Container(
-              width: 90.0,
-              height: 90.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: ScreenColor.combination, width: 2.0),
-                image: DecorationImage(
-                  image: NetworkImage(agent.agentImage),
-                  fit: BoxFit.cover,
-                ),
+      onTap: onPressed,
+      child: Column(
+        children: [
+          //pompom
+          Container(
+            width: isPhone ? 60.0 : 90.0, // Adjust the size for phone views
+            height: isPhone ? 60.0 : 90.0,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: ScreenColor.combination, width: 2.0),
+              image: DecorationImage(
+                image: NetworkImage(agent.agentImage),
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 8.0),
-            Text(
-              agent.agentname,
-              style:
-                  const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8.0),
+          Text(
+            agent.agentname,
+            style: TextStyle(
+              fontSize: isPhone ? 12.0 : 16.0, // Adjust the font size for phone views
+              fontWeight: FontWeight.bold,
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }

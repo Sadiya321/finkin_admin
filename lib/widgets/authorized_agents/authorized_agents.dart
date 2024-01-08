@@ -77,10 +77,13 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'Authorized Agents',
+        title: Text(
+          isSearching ? 'Search Results' : 'Authorized Agents',
           style: MediaQuery.of(context).size.width < 600
-        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
-        : const TextStyle(fontSize: 25), ),
+              ? const TextStyle(
+                  fontSize: 18) 
+              : const TextStyle(fontSize: 25),
+        ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
@@ -95,16 +98,15 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
 
               return Row(
                 children: [
-                 
                   Text(agentName),
                   const SizedBox(
                     width: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child:  CircleAvatar(
+                    child: CircleAvatar(
                       radius: 20.0,
-                       backgroundColor: ScreenColor.subtext,
+                      backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
                           ? NetworkImage(agentImage)
                           : const AssetImage('path_to_default_image')
@@ -140,7 +142,7 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
 
   Widget _buildSearchBar() {
     return Container(
-       width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
+      width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,
