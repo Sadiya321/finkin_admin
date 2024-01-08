@@ -1070,38 +1070,74 @@ class _InfoDisplayState extends State<InfoDisplay> {
 
   void _approveLoan(String documentId) async {
     try {
-      // Get a reference to the Firestore document using the provided documentId
       final DocumentReference userDocument =
           FirebaseFirestore.instance.collection('Loan').doc(documentId);
 
-      // Update the value of the 'loanStatus' field to 'approved'
+      final DocumentSnapshot loanSnapshot = await userDocument.get();
+      final Map<String, dynamic>? loanData =
+          loanSnapshot.data() as Map<String, dynamic>?;
+
+      String? agentId = loanData?['AgentId'] as String?;
+
+      if (agentId == null) {
+        print('Error: agentId is null in Loan document');
+        return;
+      }
+
+      print('Fetched agentId from Loan document: $agentId');
       await userDocument.update({
         'Status': 'approved',
       });
+      QuerySnapshot agentsQuery = await FirebaseFirestore.instance
+          .collection('Agents')
+          .where('AgentId', isEqualTo: agentId)
+          .get();
 
-      // Display a success message or perform any other action
-      print('Loan approved for documentId: $documentId');
+      if (agentsQuery.docs.isEmpty) {
+        print('Error: AgentId not found in any Agents document');
+        return;
+      }
+      DocumentSnapshot agentDocumentSnapshot = agentsQuery.docs.first;
+      String agentDocumentId = agentDocumentSnapshot.id;
+      Map<String, dynamic>? agentData =
+          agentDocumentSnapshot.data() as Map<String, dynamic>?;
+
+      print('Fetched AgentId from Agents document: ${agentData?['AgentId']}');
+
+      if (agentData != null) {
+        int currentMonth = agentData['Month'] as int? ?? 0;
+        int currentYear = agentData['Year'] as int? ?? 0;
+        int newMonth = currentMonth + 1;
+        int newYear = currentYear + 1;
+
+        await FirebaseFirestore.instance
+            .collection('Agents')
+            .doc(agentDocumentId)
+            .update({
+          'Month': newMonth,
+          'Year': newYear,
+        });
+
+        print(
+            'Loan approved for documentId: $documentId. Month incremented to $newMonth in Agents document: $agentDocumentId');
+      } else {
+        print('Error: agentData is null in Agents document: $agentDocumentId');
+      }
     } catch (error) {
-      // Handle errors, display an error message, or perform any other action
       print('Error approving loan: $error');
     }
   }
 
   void _denyLoan(String documentId) async {
     try {
-      // Get a reference to the Firestore document using the provided documentId
       final DocumentReference userDocument =
           FirebaseFirestore.instance.collection('Loan').doc(documentId);
-
-      // Update the value of the 'loanStatus' field to 'approved'
       await userDocument.update({
         'Status': 'denied',
       });
 
-      // Display a success message or perform any other action
       print('Loan denied for documentId: $documentId');
     } catch (error) {
-      // Handle errors, display an error message, or perform any other action
       print('Error approving loan: $error');
     }
   }

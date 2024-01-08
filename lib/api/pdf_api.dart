@@ -21,136 +21,120 @@ class PdfApi {
     }
 
     final LoanModel loan = LoanModel.fromSnapshot(loanSnapshot);
-
     final logoUrl = loan.logo;
-    final panUrl = loan.panImg;
-    final aadharUrl = loan.aadharImg;
-    final imageUrl4 = loan.secondImg;
-    final imageUrl5 = loan.itReturnImg;
-    final imageUrl6 = loan.form16img;
-    final imageUrl7 = loan.userImage;
-    final panRef = FirebaseStorage.instance.ref().child(panUrl);
     final logoRef = FirebaseStorage.instance.ref().child(logoUrl);
-    final addharRef = FirebaseStorage.instance.ref().child(aadharUrl);
-    final panBytes = await panRef.getData();
     final logoBytes = await logoRef.getData();
-    final aadharBytes = await addharRef.getData();
-     final imageRef4 = FirebaseStorage.instance.ref().child(imageUrl4);
-    final imageRef5 = FirebaseStorage.instance.ref().child(imageUrl5);
-    final imageRef6 = FirebaseStorage.instance.ref().child(imageUrl6);
-
-    final imageRef7 = FirebaseStorage.instance.ref().child(imageUrl7);
-    final imageBytes4 = await imageRef4.getData();
-    final imageBytes5 = await imageRef5.getData();
-    final imageBytes6 = await imageRef6.getData();
-    final imageBytes7 = await imageRef7.getData();
+    final userImageRef = FirebaseStorage.instance.ref().child(loan.userImage);
+    final userImageBytes = await userImageRef.getData();
 
     final pdf = pw.Document();
 
-    pdf.addPage(pw.Page(
-      build: (context) => pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.center,
-        children: [
-          pw.SizedBox(height: 5),
-          pw.Container(
-            width: 100.0,
-            height: 100.0,
-            decoration: const pw.BoxDecoration(
-              shape: pw.BoxShape.circle,
+    pdf.addPage(
+      pw.Page(
+          build: (context) => pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Container(
+                      alignment: pw.Alignment.center,
+                      width: 150.0,
+                      height: 150.0,
+                      decoration: const pw.BoxDecoration(
+                        shape: pw.BoxShape.circle,
+                      ),
+                      child: pw.Image(pw.MemoryImage(logoBytes!)),
+                    ),
+                    pw.Text(
+                      'Loan Details',
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold, fontSize: 20),
+                    ),
+                    pw.SizedBox(height: 20),
+                    pw.Container(
+                      alignment: pw.Alignment.center,
+                      width: 120.0,
+                      height: 150.0,
+                      decoration: const pw.BoxDecoration(
+                        shape: pw.BoxShape.circle,
+                      ),
+                      child: pw.Image(
+                        pw.MemoryImage(userImageBytes!),
+                        width: 120.0,
+                        height: 150.0,
+                        fit: pw.BoxFit.cover,
+                      ),
+                    ),
+                    pw.SizedBox(height: 10),
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: const pw.FlexColumnWidth(1),
+                        1: const pw.FlexColumnWidth(2),
+                      },
+                      children: [
+                        _buildTableRow('User Name', loan.userName),
+                        _buildTableRow('Loan Type', loan.loanType),
+                        _buildTableRow('Phone Number', loan.phone),
+                        _buildTableRow('Pan Number', loan.panNoCpy),
+                        _buildTableRow('Aadhar Number', loan.aadharNo),
+                        _buildTableRow('DOB', loan.date.toString()),
+                        _buildTableRow('Address', loan.address),
+                        _buildTableRow('Pin Code', loan.pin),
+                        _buildTableRow('Nationality', loan.nationality),
+                        _buildTableRow('Email', loan.email),
+                        _buildTableRow('Employee Type', loan.empType),
+                        _buildTableRow('Income', loan.combinedIncome),
+                      ],
+                    ),
+                  ])),
+    );
+
+    final imageUrls = [
+      loan.panImg,
+      loan.aadharImg,
+      loan.bankImg,
+      loan.secondImg,
+      loan.itReturnImg,
+      loan.form16img,
+    ];
+
+    final textLabels = [
+      'PAN Image',
+      'Aadhar Image',
+      'Bank Image',
+      'Second Image',
+      'IT Return Image',
+      'Form 16 Image',
+    ];
+
+    for (int i = 0; i < imageUrls.length; i++) {
+      final imageUrl = imageUrls[i];
+      final imageRef = FirebaseStorage.instance.ref().child(imageUrl);
+      final imageBytes = await imageRef.getData();
+
+      pdf.addPage(pw.Page(
+        build: (context) => pw.Column(
+          mainAxisAlignment: pw.MainAxisAlignment.center,
+          children: [
+            pw.Text(
+              textLabels[i],
+              style:
+                  pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 22),
             ),
-            child: pw.Image(pw.MemoryImage(logoBytes!)),
-          ),
-          pw.SizedBox(height: 20),
-          pw.Text(
-            'Loan Details',
-            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 20),
-          ),
-          pw.SizedBox(height: 10),
-          pw.Table.fromTextArray(
-            context: context,
-            cellAlignment: pw.Alignment.centerLeft,
-            headerAlignment: pw.Alignment.centerLeft,
-            cellHeight: 30,
-            headerHeight: 40,
-            headers: ['Field', 'Value'],
-            data: [
-              ['User Name', loan.userName],
-              ['Loan Type', loan.loanType],
-              ['Phone', loan.phone],
-              ['Pan Number', loan.panNoCpy],
-              ['Aadhar Number', loan.aadharNo],
-              ['Date', loan.date],
-              ['Address', loan.address],
-              ['PinCode', loan.pin],
-              ['Email', loan.email],
-              ['Income', loan.combinedIncome],
-              
-              ['PAN Image', pw.Container(
-                width: 150.0,
-                height: 150.0,
-                decoration: const pw.BoxDecoration(
-                  shape: pw.BoxShape.circle,
+            pw.SizedBox(height: 25),
+            pw.Center(
+              child: pw.Container(
+                width: 300.0,
+                height: 350.0,
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(),
                 ),
-                child: pw.Image(pw.MemoryImage(panBytes!)),
-              )],
-              ['Aadhar Image', pw.Container(
-                width: 150.0,
-                height: 150.0,
-                decoration: const pw.BoxDecoration(
-                  shape: pw.BoxShape.circle,
-                ),
-                child: pw.Image(pw.MemoryImage(aadharBytes!)),
-              )],
-
-              ['User Image', 
-                pw.Container(
-            width: 80.0,
-            height: 80.0,
-            decoration: const pw.BoxDecoration(
-              shape: pw.BoxShape.circle,
+                child: pw.Image(pw.MemoryImage(imageBytes!)),
+              ),
             ),
-            child: pw.Image(pw.MemoryImage(imageBytes7!)),
-          ),],
-
-
-          ['Second Image', 
-               pw.Container(
-            width: 80.0,
-            height: 80.0,
-            decoration: const pw.BoxDecoration(
-              shape: pw.BoxShape.circle,
-            ),
-            child: pw.Image(pw.MemoryImage(imageBytes4!)),
-          ),],
-
-          ['IT Return Image', 
-                pw.Container(
-            width: 80.0,
-            height: 80.0,
-            decoration: const pw.BoxDecoration(
-              shape: pw.BoxShape.circle,
-            ),
-            child: pw.Image(pw.MemoryImage(imageBytes5!)),
-          ),],
-
-
-               ['Form16 Image', 
-                 pw.Container(
-            width: 80.0,
-            height: 80.0,
-            decoration: const pw.BoxDecoration(
-              shape: pw.BoxShape.circle,
-            ),
-            child: pw.Image(pw.MemoryImage(imageBytes6!)),
-          ),],
-
-
-            ],
-          ),
-        ],
-      ),
-    ));
-
+          ],
+        ),
+      ));
+    }
     final Uint8List pdfBytes = await pdf.save();
     final blob = html.Blob([pdfBytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
@@ -161,5 +145,20 @@ class PdfApi {
       ..click();
 
     html.Url.revokeObjectUrl(url);
+  }
+
+  static pw.TableRow _buildTableRow(String label, String value) {
+    return pw.TableRow(
+      children: [
+        pw.Container(
+          padding: const pw.EdgeInsets.all(8),
+          child: pw.Text(label),
+        ),
+        pw.Container(
+          padding: const pw.EdgeInsets.all(8),
+          child: pw.Text(value),
+        ),
+      ],
+    );
   }
 }

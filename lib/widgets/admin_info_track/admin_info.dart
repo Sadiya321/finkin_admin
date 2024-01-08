@@ -53,7 +53,7 @@ class _AdminInfoState extends State<AdminInfo> {
                       width: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color:  ScreenColor.subtext.withOpacity(0.4),
+                        color: ScreenColor.subtext.withOpacity(0.4),
                       ),
                       child: _imageBytes == null
                           ? const Icon(
@@ -174,7 +174,9 @@ class _AdminInfoState extends State<AdminInfo> {
                   ),
                   child: const Text(
                     'Save',
-                    style: TextStyle(color:  ScreenColor.textLight,),
+                    style: TextStyle(
+                      color: ScreenColor.textLight,
+                    ),
                   ),
                 ),
               ],
