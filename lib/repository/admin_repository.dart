@@ -49,4 +49,60 @@ class AdminRepository extends GetxController {
       return null;
     }
   }
+
+  Future<bool> updateAdminImage(String adminId, String imageUrl) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('Admin')
+              .where('AdminId', isEqualTo: adminId)
+              .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Document with the specified admin ID exists
+        // Update admin image
+        String docId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('Admin')
+            .doc(docId)
+            .update({'AdminImage': imageUrl});
+
+        return true;
+      } else {
+        print("Document with AdminId $adminId does not exist.");
+        return false;
+      }
+    } catch (e) {
+      print('Error updating AdminImage in Firestore: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateAdminName(String adminId, String name) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('Admin')
+              .where('AdminId', isEqualTo: adminId)
+              .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Document with the specified admin ID exists
+        // Update admin name
+        String docId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('Admin')
+            .doc(docId)
+            .update({'AdminName': name});
+
+        return true;
+      } else {
+        print("Document with AdminId $adminId does not exist.");
+        return false;
+      }
+    } catch (e) {
+      print('Error updating AdminName in Firestore: $e');
+      return false;
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
+import 'package:finkin_admin/widgets/admin_info_track/update_profile.dart';
 import 'package:finkin_admin/widgets/agents_track/agent_track.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -76,10 +77,13 @@ class _AllAgentsState extends State<AllAgents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isSearching ? 'Search Results' : 'Login request',
+        title: Text(
+          isSearching ? 'Search Results' : 'Login request',
           style: MediaQuery.of(context).size.width < 600
-        ? const TextStyle(fontSize: 18) // Adjust the font size for mobile view
-        : const TextStyle(fontSize: 25), ),
+              ? const TextStyle(
+                  fontSize: 18) // Adjust the font size for mobile view
+              : const TextStyle(fontSize: 25),
+        ),
         actions: [
           _buildSearchBar(),
           const SizedBox(
@@ -94,19 +98,24 @@ class _AllAgentsState extends State<AllAgents> {
 
               return Row(
                 children: [
-                  
                   Text(agentName),
                   const SizedBox(
                     width: 10,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const UpdateInfo(),
+                        ),
+                      );
+                    },
                     child: CircleAvatar(
                       radius: 20.0,
-                       backgroundColor: ScreenColor.subtext,
+                      backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
                           ? NetworkImage(agentImage)
-                          : const AssetImage('path_to_default_image')
+                          : const AssetImage('assets/images/error.png')
                               as ImageProvider<Object>?,
                     ),
                   ),
@@ -138,7 +147,7 @@ class _AllAgentsState extends State<AllAgents> {
 
   Widget _buildSearchBar() {
     return Container(
-       width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
+      width: MediaQuery.of(context).size.width < 600 ? 120.0 : 200.0,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: ScreenColor.subtext,

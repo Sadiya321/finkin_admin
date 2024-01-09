@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/loan_model/loan_model.dart';
 import 'package:finkin_admin/res/constants/enums/enums.dart';
+import 'package:finkin_admin/widgets/admin_info_track/update_profile.dart';
 import 'package:finkin_admin/widgets/loantrack/loan_track.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -69,17 +70,23 @@ class _LoanRequestState extends State<LoanRequest> {
                   const SizedBox(
                     width: 10,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CircleAvatar(
-                      radius: 20.0,
-                      backgroundColor: ScreenColor.subtext,
-                      backgroundImage: agentImage != null
-                          ? NetworkImage(agentImage)
-                          : const AssetImage('path_to_default_image')
-                              as ImageProvider<Object>?,
-                    ),
-                  ),
+                InkWell(
+  onTap: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const UpdateInfo(),
+      ),
+    );
+  },
+  child: CircleAvatar(
+    radius: 20.0,
+    backgroundColor: ScreenColor.subtext,
+    backgroundImage: agentImage != null
+        ? NetworkImage(agentImage)
+        : const AssetImage('aassets/images/error.png') as ImageProvider<Object>?,
+  ),
+),
+
                 ],
               );
             },

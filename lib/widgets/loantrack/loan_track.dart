@@ -25,115 +25,125 @@ class LoanTrack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat.yMMMd().format(date);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenSize = constraints.maxWidth;
 
-    return GestureDetector(
-      onTap: onPressed,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: ScreenColor.textLight,
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(
-              color: Colors.black,
-              width: 1.0,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
-                    child: SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: Image.network(
-                        imageAsset,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        loanType,
-                        style: const TextStyle(fontSize: 10),
-                        softWrap: false,
-                        maxLines: 1,
-                        overflow: TextOverflow.fade,
-                      ),
-                    ],
-                  ),
-                ],
+        // Define scaling factors based on screen width
+        final imageScaleFactor = screenSize < 600 ? 0.1 : 0.04;
+        final fontSize16 = screenSize * 0.01;
+        final fontSize10 = screenSize * 0.01;
+        final fontSize12 = screenSize * 0.01;
+
+        return GestureDetector(
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(26),
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1.0,
+                ),
               ),
-              const SizedBox(
-                width: 18,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        icon,
-                        color: ScreenColor.icon,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: SizedBox(
+                          width: screenSize * imageScaleFactor,
+                          height: screenSize * imageScaleFactor,
+                          child: Image.network(
+                            imageAsset,
+                            width: screenSize * imageScaleFactor,
+                            height: screenSize * imageScaleFactor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userName,
+                            style: TextStyle(
+                              fontSize: fontSize16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 2,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            loanType,
+                            style: TextStyle(fontSize: fontSize10),
+                            softWrap: false,
+                            maxLines: 1,
+                            overflow: TextOverflow.fade,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(
-                width: 2,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
                   const SizedBox(
-                    width: 12,
+                    width: 18,
                   ),
-                  Text(
-                    formattedDate,
-                    style: const TextStyle(fontSize: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            icon,
+                            color: Colors.green,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  Text(
-                    status.name,
-                    style: const TextStyle(fontSize: 12),
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      Text(
+                        DateFormat.yMMMd().format(date),
+                        style: TextStyle(fontSize: fontSize12),
+                      ),
+                      // Adjust font size dynamically based on the screen width
+                      Text(
+                        "Status",
+                        style: TextStyle(fontSize: fontSize12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: onPressed,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                       backgroundColor: Colors.lightBlueAccent
+                    ),
+                    child: const Text('Open'),
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: onPressed,
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.blue,
-                  onPrimary: Colors.white,
-                ),
-                child: const Text('Open'),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/login/views/login_view.dart';
+import 'package:finkin_admin/widgets/admin_info_track/update_profile.dart';
 import 'package:finkin_admin/widgets/all_agents_content/all_agents_content.dart';
 import 'package:finkin_admin/widgets/all_loans_content/all_loans_content.dart';
 import 'package:finkin_admin/widgets/all_users_content/all_users_content.dart';
@@ -322,17 +323,22 @@ Future<void> _signOut() async {
               actions: [
                 Text(agentName),
                 const SizedBox(width: 20),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircleAvatar(
-                    radius: 20.0,
-                    backgroundColor: ScreenColor.subtext,
-                    backgroundImage: agentImage != null
-                        ? NetworkImage(agentImage)
-                        : const AssetImage('assets/images/hill.png')
-                            as ImageProvider<Object>?,
-                  ),
-                ),
+                InkWell(
+  onTap: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const UpdateInfo(),
+      ),
+    );
+  },
+  child: CircleAvatar(
+    radius: 20.0,
+    backgroundColor: ScreenColor.subtext,
+    backgroundImage: agentImage != null
+        ? NetworkImage(agentImage)
+        : const AssetImage('assets/images/error.png') as ImageProvider<Object>?,
+  ),
+),
               ],
             ),
             body: Stack(

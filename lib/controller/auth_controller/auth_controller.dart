@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finkin_admin/loan_model/admin_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -6,6 +7,7 @@ class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   RxString adminId = ''.obs;
   static AuthController get instance => Get.find();
+  final _db = FirebaseFirestore.instance;
   AuthController() {
     initAuthListener();
   }
@@ -47,6 +49,26 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       print("Error storing adminId in Firestore: $e");
+    }
+  }
+  Future<AdminModel?> getAgentById(String adminId) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+          .collection('Admin')
+          .where('AdminId', isEqualTo: adminId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot<Map<String, dynamic>> document =
+            querySnapshot.docs.first;
+        return AdminModel.fromSnapshot(document);
+      } else {
+        print("Document does not exist.");
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching agent data: $e');
+      return null;
     }
   }
 }

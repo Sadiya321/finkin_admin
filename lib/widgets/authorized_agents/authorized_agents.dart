@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_admin/common/utils/screen_color.dart';
 import 'package:finkin_admin/controller/admin_data_controller/adminData_controller.dart';
 import 'package:finkin_admin/controller/auth_controller/auth_controller.dart';
+import 'package:finkin_admin/widgets/admin_info_track/update_profile.dart';
 import 'package:finkin_admin/widgets/agents_track/agent_track.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -80,8 +81,7 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
         title: Text(
           isSearching ? 'Search Results' : 'Authorized Agents',
           style: MediaQuery.of(context).size.width < 600
-              ? const TextStyle(
-                  fontSize: 18) 
+              ? const TextStyle(fontSize: 18)
               : const TextStyle(fontSize: 25),
         ),
         actions: [
@@ -102,14 +102,20 @@ class _AuthorizedAgentsState extends State<AuthorizedAgents> {
                   const SizedBox(
                     width: 10,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const UpdateInfo(),
+                        ),
+                      );
+                    },
                     child: CircleAvatar(
                       radius: 20.0,
                       backgroundColor: ScreenColor.subtext,
                       backgroundImage: agentImage != null
                           ? NetworkImage(agentImage)
-                          : const AssetImage('path_to_default_image')
+                          : const AssetImage('assets/images/error.png')
                               as ImageProvider<Object>?,
                     ),
                   ),

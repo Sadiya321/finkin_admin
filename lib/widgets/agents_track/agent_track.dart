@@ -41,37 +41,44 @@ class AgentGridItem extends StatelessWidget {
     this.onPressed,
   }) : super(key: key);
 
-  @override
+ @override
   Widget build(BuildContext context) {
-    bool isPhone = MediaQuery.of(context).size.width < 600; // Adjust the threshold as needed
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double screenWidth = constraints.maxWidth;
+         double imageSizePercentage = screenWidth < 600 ? 0.40 : 0.54;
+        double fontSizePercentage = screenWidth < 600 ? 0.075 : 0.80;
+        //   double imageSizePercentage = screenWidth < 600 ? 0.30 : 0.45;
+        // double fontSizePercentage = screenWidth < 600 ? 0.070 : 0.80;
 
-    return GestureDetector(
-      onTap: onPressed,
-      child: Column(
-        children: [
-          //pompom
-          Container(
-            width: isPhone ? 60.0 : 90.0, // Adjust the size for phone views
-            height: isPhone ? 60.0 : 90.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: ScreenColor.combination, width: 2.0),
-              image: DecorationImage(
-                image: NetworkImage(agent.agentImage),
-                fit: BoxFit.cover,
+        double imageSize = screenWidth * imageSizePercentage;
+        double fontSize = screenWidth * fontSizePercentage;
+
+        return GestureDetector(
+          onTap: onPressed,
+          child: Column(
+            children: [
+              Container(
+                width: imageSize,
+                height: imageSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.black, width: 2.0),
+                  image: DecorationImage(
+                    image: NetworkImage(agent.agentImage),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 8.0),
+              Text(
+                agent.agentname,
+                style: TextStyle(fontSize: fontSize),
+              ),
+            ],
           ),
-          const SizedBox(height: 8.0),
-          Text(
-            agent.agentname,
-            style: TextStyle(
-              fontSize: isPhone ? 12.0 : 16.0, // Adjust the font size for phone views
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
